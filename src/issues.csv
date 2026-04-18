@@ -1,0 +1,23 @@
+﻿Id,Category,IssueName
+1,Engine System,Overheating
+2,Engine System,misfire
+3,Cooling System,Radiator leak
+4,Cooling System,fan failure
+5,Fuel System,Hard start
+6,Fuel System,poor fuel delivery
+7,Transmission System,Slipping
+8,Transmission System,delayed shifting
+9,Brake System,Worn pads
+10,Brake System,fluid leak
+11,Suspension System,Noise
+12,Suspension System,worn shocks
+13,Steering System,Hard steering
+14,Steering System,fluid leak
+15,Electrical System,Battery
+16,Electrical System,alternator
+17,Exhaust System,Smoke
+18,Exhaust System,emission failure
+19,HVAC (Aircon),No cooling
+20,Tires & Wheels,Flat tire
+21,Body & Frame,Dents
+22,Body & Frame,Rust

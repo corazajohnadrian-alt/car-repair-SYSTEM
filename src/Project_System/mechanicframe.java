@@ -9,13 +9,94 @@ package Project_System;
  *
  * @author Adrian
  */
+import static Project_System.adminframe.assigntable;
+import java.awt.Component;
+import java.awt.Font;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
 public class mechanicframe extends javax.swing.JFrame {
+    static String username;
+    
+    private Timer refreshTimer;
+    static String mechanicname ; // Change this to actual mechanic name
+    static String problemfile = "src\\problems.csv";
+    static String partsreq = "src\\workorder.csv";
+    static String inventory = "src\\inventory.csv";
+    private Map<Integer, String[]> rowProblemsMap = new HashMap<>();
+    private Map<Integer, String[]> rowPartsMap = new HashMap<>();
+    private Map<Integer, String> rowSlotMap = new HashMap<>(); // tableRow -> slot number
+    
+    // Messenger fields
+    private Map<String, List<String[]>> conversations = new LinkedHashMap<>(); // key=customerKey, value=list of [sender,message]
+    private Map<String, String>         displayNames   = new LinkedHashMap<>(); // key=customerKey, value=real display name
+    private java.util.Set<String>       readConversations = new java.util.HashSet<>();
+    private String                      activeChatUser = null;
+    static final String                 MESSAGES_CSV   = "src\\MESSAGES.csv";
+
+    private void startRefreshing() {
+    refreshTimer = new Timer(2000, e -> {
+        refreshMessages();
+        loadDashboard(); // ← keeps workqueue + notifications live
+    });
+    refreshTimer.start();
+}
 
     /**
      * Creates new form userframe
      */
-    public mechanicframe() {
+    public mechanicframe(String username) {
         initComponents();
+        
+        // System name for frame
+        this.setTitle("FIXO: Framework for Interactive X-auto Operations");
+        try {
+            // for logo in frame
+            ImageIcon logo = new ImageIcon(getClass().getResource("/Project_System/resources/logo.png"));
+            this.setIconImage(logo.getImage());
+        } catch (Exception e) {
+            System.out.println("Logo could not be loaded: " + e.getMessage());
+        }
+        
+        setSize(1380, 724);
+        initChatHeadListener();
+        refreshMessages();       
+        startRefreshing();
+        loadDashboard();
+
+        workreq();
+        this.mechanicname = username;
+        SwingUtilities.invokeLater(() -> {
+        getdata();
+        loadparts();
+        });
+
+        this.setLocationRelativeTo(null);
     }
 
     /**
@@ -27,21 +108,1621 @@ public class mechanicframe extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jPanel1 = new Project_System.Design.GradientPanel();
+        DB = new Project_System.Design.ModernButton();
+        PR = new Project_System.Design.ModernButton();
+        SS = new Project_System.Design.ModernButton();
+        M = new Project_System.Design.ModernButton();
+        H = new Project_System.Design.ModernButton();
+        jLabel23 = new Project_System.Design.RoundedLogo();
+        jLabel24 = new javax.swing.JLabel();
+        jButton4 = new Project_System.Design.ModernButton();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        Dashboard = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new Project_System.Design.RoundedPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        notifications = new javax.swing.JTextArea();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        worklist = new javax.swing.JTextArea();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        Partrequest = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel9 = new Project_System.Design.RoundedPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        requesttable = new Project_System.Design.ModernTable();
+        Servicestatus = new javax.swing.JPanel();
+        jLabel16 = new javax.swing.JLabel();
+        jPanel19 = new javax.swing.JPanel();
+        jPanel8 = new Project_System.Design.RoundedPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        servicetable = new Project_System.Design.ModernTable();
+        jLabel38 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        Messages = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel23 = new Project_System.Design.RoundedPanel();
+        jLabel76 = new javax.swing.JLabel();
+        jLabel77 = new javax.swing.JLabel();
+        messagetext2 = new javax.swing.JTextField();
+        messagesend2 = new Project_System.Design.ModernButton()
+        ;
+        jScrollPane3 = new javax.swing.JScrollPane();
+        messagearea2 = new javax.swing.JTextArea();
+        jButton15 = new javax.swing.JButton();
+        jTextField21 = new javax.swing.JTextField();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jLabel17 = new javax.swing.JLabel();
+        History = new javax.swing.JPanel();
+        jLabel18 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel7 = new Project_System.Design.RoundedPanel();
+        jScrollPane11 = new javax.swing.JScrollPane();
+        historytable = new Project_System.Design.ModernTable();
+        jLabel4 = new javax.swing.JLabel();
+        COMPLETEDJOBS = new javax.swing.JLabel();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMaximumSize(new java.awt.Dimension(1280, 720));
+        setMinimumSize(new java.awt.Dimension(1280, 720));
+        setPreferredSize(new java.awt.Dimension(1280, 720));
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel1.setBackground(new java.awt.Color(102, 102, 102));
+        jPanel1.setOpaque(false);
+        jPanel1.setPreferredSize(new java.awt.Dimension(330, 720));
+
+        DB.setBackground(new java.awt.Color(255, 255, 255));
+        DB.setFont(new java.awt.Font("Bahnschrift", 1, 12)); // NOI18N
+        DB.setForeground(new java.awt.Color(0, 153, 153));
+        DB.setText("DASHBOARD");
+        DB.setPreferredSize(new java.awt.Dimension(277, 23));
+        DB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DBActionPerformed(evt);
+            }
+        });
+
+        PR.setBackground(new java.awt.Color(255, 255, 255));
+        PR.setFont(new java.awt.Font("Bahnschrift", 1, 12)); // NOI18N
+        PR.setForeground(new java.awt.Color(0, 153, 153));
+        PR.setText("PART REQUEST");
+        PR.setPreferredSize(new java.awt.Dimension(277, 70));
+        PR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PRActionPerformed(evt);
+            }
+        });
+
+        SS.setBackground(new java.awt.Color(255, 255, 255));
+        SS.setFont(new java.awt.Font("Bahnschrift", 1, 12)); // NOI18N
+        SS.setForeground(new java.awt.Color(0, 153, 153));
+        SS.setText("SERVICE STATUS");
+        SS.setPreferredSize(new java.awt.Dimension(277, 70));
+        SS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SSActionPerformed(evt);
+            }
+        });
+
+        M.setBackground(new java.awt.Color(255, 255, 255));
+        M.setFont(new java.awt.Font("Bahnschrift", 1, 12)); // NOI18N
+        M.setForeground(new java.awt.Color(0, 153, 153));
+        M.setText("MESSAGES");
+        M.setPreferredSize(new java.awt.Dimension(277, 70));
+        M.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MActionPerformed(evt);
+            }
+        });
+
+        H.setBackground(new java.awt.Color(255, 255, 255));
+        H.setFont(new java.awt.Font("Bahnschrift", 1, 12)); // NOI18N
+        H.setForeground(new java.awt.Color(0, 153, 153));
+        H.setText("HISTORY");
+        H.setPreferredSize(new java.awt.Dimension(277, 70));
+        H.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                HActionPerformed(evt);
+            }
+        });
+
+        jLabel23.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Project_System/resources/logo.png"))); // NOI18N
+        jLabel23.setMaximumSize(new java.awt.Dimension(100, 100));
+        jLabel23.setMinimumSize(new java.awt.Dimension(100, 100));
+        jLabel23.setPreferredSize(new java.awt.Dimension(100, 100));
+
+        jLabel24.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 28)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel24.setText("FIXO");
+        jLabel24.setMaximumSize(new java.awt.Dimension(100, 100));
+        jLabel24.setMinimumSize(new java.awt.Dimension(100, 100));
+        jLabel24.setPreferredSize(new java.awt.Dimension(100, 100));
+
+        jButton4.setBackground(new java.awt.Color(106, 141, 146));
+        jButton4.setFont(new java.awt.Font("Roboto", 1, 11)); // NOI18N
+        jButton4.setForeground(new java.awt.Color(255, 255, 255));
+        jButton4.setText("Log out");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(H, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(M, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(SS, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(PR, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(DB, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(106, 106, 106)
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addComponent(DB, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(PR, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(SS, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(M, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(H, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(70, 70, 70)
+                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(84, Short.MAX_VALUE))
         );
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 740));
+
+        jTabbedPane1.setMaximumSize(new java.awt.Dimension(975, 720));
+        jTabbedPane1.setMinimumSize(new java.awt.Dimension(975, 720));
+        jTabbedPane1.setPreferredSize(new java.awt.Dimension(975, 720));
+
+        Dashboard.setBackground(new java.awt.Color(0, 0, 0));
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("DASHBOARD");
+        jLabel3.setPreferredSize(new java.awt.Dimension(234, 52));
+
+        jPanel2.setBackground(new java.awt.Color(239, 239, 239));
+        jPanel2.setPreferredSize(new java.awt.Dimension(1000, 623));
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+
+        notifications.setColumns(20);
+        notifications.setRows(5);
+        jScrollPane2.setViewportView(notifications);
+
+        worklist.setColumns(20);
+        worklist.setRows(5);
+        jScrollPane4.setViewportView(worklist);
+
+        jLabel14.setFont(new java.awt.Font("Bahnschrift", 0, 12)); // NOI18N
+        jLabel14.setText("WORKQUE");
+
+        jLabel5.setFont(new java.awt.Font("Bahnschrift", 0, 12)); // NOI18N
+        jLabel5.setText("NOTIFICATIONS");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 549, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addComponent(jLabel5))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel14)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 490, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 490, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20))
+        );
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(62, Short.MAX_VALUE))
+        );
+
+        jLabel19.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel19.setText("Mechanic");
+
+        jLabel20.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel20.setText("USER NAME");
+
+        javax.swing.GroupLayout DashboardLayout = new javax.swing.GroupLayout(Dashboard);
+        Dashboard.setLayout(DashboardLayout);
+        DashboardLayout.setHorizontalGroup(
+            DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, DashboardLayout.createSequentialGroup()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(586, 586, 586)
+                .addGroup(DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel19, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel20, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(49, 49, 49))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, DashboardLayout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 960, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        DashboardLayout.setVerticalGroup(
+            DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(DashboardLayout.createSequentialGroup()
+                .addGroup(DashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(DashboardLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel19)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                    .addGroup(DashboardLayout.createSequentialGroup()
+                        .addGap(41, 41, 41)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 639, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("tab1", Dashboard);
+
+        Partrequest.setBackground(new java.awt.Color(0, 0, 0));
+
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("Mechanic");
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel7.setText("USER NAME");
+
+        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel15.setText("PART REQUEST");
+        jLabel15.setPreferredSize(new java.awt.Dimension(234, 52));
+
+        jPanel4.setBackground(new java.awt.Color(239, 239, 239));
+
+        jPanel9.setBackground(new java.awt.Color(255, 255, 255));
+
+        requesttable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ACTIVE JOB", "CUSTOMER", "VEHICLES", "ISSUE", "DATE", "REQUEST PARTS", "ADD NOTES"
+            }
+        ));
+        requesttable.setOpaque(false);
+        jScrollPane1.setViewportView(requesttable);
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 847, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 529, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(47, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(46, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout PartrequestLayout = new javax.swing.GroupLayout(Partrequest);
+        Partrequest.setLayout(PartrequestLayout);
+        PartrequestLayout.setHorizontalGroup(
+            PartrequestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PartrequestLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 418, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(PartrequestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(38, 38, 38))
+            .addGroup(PartrequestLayout.createSequentialGroup()
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        PartrequestLayout.setVerticalGroup(
+            PartrequestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PartrequestLayout.createSequentialGroup()
+                .addGap(41, 41, 41)
+                .addGroup(PartrequestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(PartrequestLayout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(6, 6, 6)
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("tab3", Partrequest);
+
+        Servicestatus.setBackground(new java.awt.Color(0, 0, 0));
+        Servicestatus.setPreferredSize(new java.awt.Dimension(975, 720));
+
+        jLabel16.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel16.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel16.setText("SERVICE REQUEST");
+        jLabel16.setPreferredSize(new java.awt.Dimension(234, 52));
+
+        jPanel19.setBackground(new java.awt.Color(239, 239, 239));
+
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+
+        servicetable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID NO#", "CUSTOMER", "VEHICLE", "ISSUE ", "DATE", "PARTS", "STATUS"
+            }
+        ));
+        servicetable.setOpaque(false);
+        jScrollPane8.setViewportView(servicetable);
+
+        jLabel38.setFont(new java.awt.Font("sansserif", 1, 24)); // NOI18N
+        jLabel38.setText("STATUS BOARD");
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 842, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel38))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addComponent(jLabel38)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
+        jPanel19.setLayout(jPanel19Layout);
+        jPanel19Layout.setHorizontalGroup(
+            jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel19Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(53, Short.MAX_VALUE))
+        );
+        jPanel19Layout.setVerticalGroup(
+            jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel19Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(56, Short.MAX_VALUE))
+        );
+
+        jLabel21.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel21.setText("Mechanic");
+
+        jLabel22.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel22.setText("USER NAME");
+
+        javax.swing.GroupLayout ServicestatusLayout = new javax.swing.GroupLayout(Servicestatus);
+        Servicestatus.setLayout(ServicestatusLayout);
+        ServicestatusLayout.setHorizontalGroup(
+            ServicestatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ServicestatusLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(ServicestatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel21, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel22, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(38, 38, 38))
+            .addComponent(jPanel19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        ServicestatusLayout.setVerticalGroup(
+            ServicestatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ServicestatusLayout.createSequentialGroup()
+                .addGap(41, 41, 41)
+                .addGroup(ServicestatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(ServicestatusLayout.createSequentialGroup()
+                        .addComponent(jLabel21)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("tab4", Servicestatus);
+
+        Messages.setBackground(new java.awt.Color(0, 0, 0));
+        Messages.setPreferredSize(new java.awt.Dimension(975, 720));
+
+        jPanel5.setBackground(new java.awt.Color(239, 239, 239));
+
+        jPanel23.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel76.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
+        jLabel76.setText("Message| Time");
+
+        jLabel77.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
+        jLabel77.setText("User name");
+
+        messagetext2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                messagetext2messagetextActionPerformed(evt);
+            }
+        });
+
+        messagesend2.setBackground(new java.awt.Color(0, 153, 153));
+        messagesend2.setForeground(new java.awt.Color(255, 255, 255));
+        messagesend2.setText("Send");
+        messagesend2.setBorder(null);
+        messagesend2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                messagesend2messagesendActionPerformed(evt);
+            }
+        });
+
+        messagearea2.setColumns(20);
+        messagearea2.setRows(5);
+        jScrollPane3.setViewportView(messagearea2);
+
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15jButton9ActionPerformed(evt);
+            }
+        });
+
+        jTextField21.setText("Search");
+        jTextField21.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField21ActionPerformed(evt);
+            }
+        });
+
+        jTable1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null},
+                {null},
+                {null},
+                {null}
+            },
+            new String [] {
+                "MESSAGES"
+            }
+        ));
+        jTable1.setRowHeight(100);
+        jScrollPane9.setViewportView(jTable1);
+
+        javax.swing.GroupLayout jPanel23Layout = new javax.swing.GroupLayout(jPanel23);
+        jPanel23.setLayout(jPanel23Layout);
+        jPanel23Layout.setHorizontalGroup(
+            jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel23Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jTextField21, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel23Layout.createSequentialGroup()
+                        .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel76)
+                            .addComponent(jLabel77))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel23Layout.createSequentialGroup()
+                        .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 619, Short.MAX_VALUE)
+                            .addGroup(jPanel23Layout.createSequentialGroup()
+                                .addComponent(messagetext2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(messagesend2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(20, 20, 20))))
+        );
+        jPanel23Layout.setVerticalGroup(
+            jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel23Layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel23Layout.createSequentialGroup()
+                        .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel23Layout.createSequentialGroup()
+                                .addComponent(jLabel77)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel76))
+                            .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 406, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(messagesend2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(messagetext2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel23Layout.createSequentialGroup()
+                        .addComponent(jTextField21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 507, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel17.setText("MESSAGES");
+        jLabel17.setPreferredSize(new java.awt.Dimension(234, 52));
+
+        javax.swing.GroupLayout MessagesLayout = new javax.swing.GroupLayout(Messages);
+        Messages.setLayout(MessagesLayout);
+        MessagesLayout.setHorizontalGroup(
+            MessagesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(MessagesLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(MessagesLayout.createSequentialGroup()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        MessagesLayout.setVerticalGroup(
+            MessagesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(MessagesLayout.createSequentialGroup()
+                .addGap(41, 41, 41)
+                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("tab5", Messages);
+
+        History.setBackground(new java.awt.Color(0, 0, 0));
+        History.setPreferredSize(new java.awt.Dimension(975, 720));
+
+        jLabel18.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel18.setText("HISTORY");
+        jLabel18.setPreferredSize(new java.awt.Dimension(234, 52));
+
+        jPanel6.setBackground(new java.awt.Color(239, 239, 239));
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+
+        historytable.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        historytable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "DATE", "PLATENUMBER", "CUSTOMER", "BRAND", "TOTAL SPENT", "PAID/NOT PAID", "COMPLETED"
+            }
+        ));
+        historytable.setRowHeight(25);
+        jScrollPane11.setViewportView(historytable);
+
+        jLabel4.setFont(new java.awt.Font("Bahnschrift", 0, 12)); // NOI18N
+        jLabel4.setText("TOTAL COMPLETED JOBS");
+
+        COMPLETEDJOBS.setFont(new java.awt.Font("Bahnschrift", 0, 12)); // NOI18N
+        COMPLETEDJOBS.setText("Count");
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(COMPLETEDJOBS))
+                    .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 864, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(COMPLETEDJOBS))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(44, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout HistoryLayout = new javax.swing.GroupLayout(History);
+        History.setLayout(HistoryLayout);
+        HistoryLayout.setHorizontalGroup(
+            HistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(HistoryLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        HistoryLayout.setVerticalGroup(
+            HistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, HistoryLayout.createSequentialGroup()
+                .addGap(41, 41, 41)
+                .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("tab6", History);
+
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(327, -46, 960, 770));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    public void loadDashboard() {
+
+    // ── NOTIFICATIONS — new status updates for this mechanic's customers ──
+    StringBuilder notifSb = new StringBuilder();
+
+    try (BufferedReader br = new BufferedReader(new FileReader("src\\updatestatus.csv"))) {
+        String line; boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            // cols: id(0),customer(1),repairman(2),diagnoses(3),customersame(4),idcustomer(5)
+            String[] cols = line.split(",", -1);
+            if (cols.length < 6) continue;
+            if (!cols[2].trim().equalsIgnoreCase(mechanicname)) continue;
+
+            String customer  = cols[1].trim();
+            String status    = cols[3].trim();
+            String timestamp = cols[4].trim();
+            String slot      = cols[5].trim();
+
+            notifSb.append("[").append(timestamp).append("]\n")
+                   .append("Customer: ").append(customer)
+                   .append(" | Car Slot: ").append(slot)
+                   .append("\nStatus: ").append(status)
+                   .append("\n\n");
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+
+    notifications.setText(notifSb.length() > 0
+        ? notifSb.toString().trim()
+        : "No notifications yet.");
+    notifications.setCaretPosition(0);
+
+
+    // ── WORKQUEUE — all jobs from problems.csv for this mechanic ──
+    DefaultTableModel serviceModel = (DefaultTableModel) servicetable.getModel();
+    serviceModel.setRowCount(0);
+
+    // First load latest status per customer+idcustomer from updatestatus.csv
+    java.util.Map<String, String> statusMap = new java.util.LinkedHashMap<>();
+    try (BufferedReader br = new BufferedReader(new FileReader("src\\updatestatus.csv"))) {
+        String line; boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            String[] cols = line.split(",", -1);
+            if (cols.length < 6) continue;
+            String key = cols[1].trim().toLowerCase() + "|" + cols[5].trim();
+            statusMap.put(key, cols[3].trim()); // overwrite = latest status
+        }
+    } catch (Exception ignored) {}
+
+    // Then load problems.csv for this mechanic — group unique jobs by idreq
+    // cols: repairmanissuenumber(0),issuenumber(1),username(2),car(3),
+    //       problems(4),date(5),idreq(6),repairman(7)
+    java.util.Map<String, String[]> jobMap = new java.util.LinkedHashMap<>();
+
+    try (BufferedReader br = new BufferedReader(new FileReader("src\\problems.csv"))) {
+        String line; boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            String[] cols = line.split(",", -1);
+            if (cols.length < 8) continue;
+            if (!cols[7].trim().equalsIgnoreCase(mechanicname)) continue;
+
+            String slot     = cols[0].trim(); // repairmanissuenumber = car slot
+            String username = cols[2].trim();
+            String car      = cols[3].trim();
+            String date     = cols[5].trim();
+            String idreq    = cols[6].trim();
+
+            // Aggregate issues for same idreq
+            String key = idreq;
+            if (jobMap.containsKey(key)) {
+                // append issue to existing row
+                String[] existing = jobMap.get(key);
+                existing[3] = existing[3] + ", " + cols[4].trim(); // append issue
+            } else {
+                String statusKey    = username.toLowerCase() + "|" + slot;
+                String currentStatus = statusMap.getOrDefault(statusKey, "PENDING");
+                jobMap.put(key, new String[]{
+                    idreq,           // ID NO#
+                    username,        // CUSTOMER
+                    car,             // VEHICLE
+                    cols[4].trim(),  // ISSUE
+                    date,            // DATE
+                    currentStatus,    // STATUS
+                        slot
+                });
+            }
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+
+    int rowIdx = serviceModel.getRowCount(); // BEFORE addRow
+    for (String[] row : jobMap.values()) {
+        rowSlotMap.put(rowIdx, row[6]); // store slot for this row
+        serviceModel.addRow(new Object[]{
+            row[0], row[1], row[2], row[3], row[4], "", row[5]
+        });
+        rowIdx++;
+    }
+}
+    
+    private void refreshMessages() {
+        Map<String, List<String[]>> fresh     = new LinkedHashMap<>();
+        Map<String, String>         freshNames = new LinkedHashMap<>();
+
+        // ── 1. Load unique customers from problems.csv assigned to this mechanic ──
+        try (BufferedReader br = new BufferedReader(new FileReader("src\\problems.csv"))) {
+            String line; boolean first = true;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (first) { first = false; continue; } // skip header
+
+                // cols: repairmanissuenumber(0), issuenumber(1), username(2), car(3),
+                //       problems(4), date(5), idreq(6), repairman(7)
+                String[] cols = line.split(",", -1);
+                if (cols.length < 8) continue;
+
+                String customer = cols[2].trim();
+                String repairman = cols[7].trim();
+
+                if (!repairman.equalsIgnoreCase(mechanicname)) continue;
+
+                String key = customer.toLowerCase();
+                freshNames.putIfAbsent(key, customer); // only add once per unique customer
+                fresh.computeIfAbsent(key, k -> new ArrayList<>());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // ── 2. Load messages from MESSAGES.csv and attach to each customer ──
+        try (BufferedReader br = new BufferedReader(new FileReader(MESSAGES_CSV))) {
+            String line; boolean first = true;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (first) { first = false; continue; }
+
+                // cols: customer(0), mechanic(1), sender(2), message(3)
+                String[] cols = line.split(",", 4);
+                if (cols.length < 4) continue;
+
+                String customer = cols[0].trim();
+                String mechanic = cols[1].trim();
+                String sender   = cols[2].trim();
+                String message  = cols[3].trim();
+
+                if (!mechanic.equalsIgnoreCase(mechanicname)) continue;
+
+                String key = customer.toLowerCase();
+                if (fresh.containsKey(key)) { // only attach if customer exists in problems.csv
+                    fresh.get(key).add(new String[]{sender, message});
+                }
+            }
+        } catch (IOException e) {
+            // MESSAGES.csv may not exist yet — that's fine
+        }
+
+        // Mark unread if new messages came in
+        for (String key : fresh.keySet()) {
+            int newCount = fresh.get(key).size();
+            int oldCount = conversations.containsKey(key) ? conversations.get(key).size() : 0;
+            if (newCount > oldCount) readConversations.remove(key);
+        }
+
+        conversations = fresh;
+        displayNames  = freshNames;
+        updateChatHeadTable();
+        if (activeChatUser != null) loadChatMessages(activeChatUser);
+    }
+    
+    private void updateChatHeadTable() {
+            DefaultTableModel headModel = new DefaultTableModel(new String[]{"MESSAGES"}, 0) {
+                @Override public boolean isCellEditable(int r, int c) { return false; }
+            };
+
+            for (Map.Entry<String, List<String[]>> entry : conversations.entrySet()) {
+                String key           = entry.getKey();
+                List<String[]> msgs = entry.getValue();
+                String lastMsg = msgs.isEmpty() ? "No messages yet" : msgs.get(msgs.size() - 1)[1];
+                boolean unread    = !readConversations.contains(key);
+
+                String displayName = displayNames.getOrDefault(key,
+                    key.substring(0, 1).toUpperCase() + key.substring(1));
+
+                String preview = lastMsg.length() > 40 ? lastMsg.substring(0, 40) + "…" : lastMsg;
+
+                // ✅ Store as a simple String array — renderer handles the drawing
+                headModel.addRow(new Object[]{ new String[]{
+                    (unread ? "🔵 " : "    ") + displayName,
+                    preview
+                }});
+            }
+
+            SwingUtilities.invokeLater(() -> {
+                jTable1.setModel(headModel);
+                jTable1.setRowHeight(60);
+
+                // ✅ Custom renderer — draws name on line 1, preview on line 2
+                jTable1.getColumnModel().getColumn(0).setCellRenderer(
+                    (table, value, isSelected, hasFocus, row, col) -> {
+                        javax.swing.JPanel panel = new javax.swing.JPanel();
+                        panel.setLayout(new java.awt.GridLayout(2, 1));
+                        panel.setBackground(isSelected
+                            ? table.getSelectionBackground()
+                            : table.getBackground());
+
+                        String[] lines = (String[]) value;
+
+                        javax.swing.JLabel nameLine = new javax.swing.JLabel(lines[0]);
+                        nameLine.setFont(new Font("Tahoma", Font.BOLD, 14));
+                        nameLine.setForeground(isSelected
+                            ? table.getSelectionForeground()
+                            : table.getForeground());
+
+                        javax.swing.JLabel previewLine = new javax.swing.JLabel(lines[1]);
+                        previewLine.setFont(new Font("Tahoma", Font.PLAIN, 12));
+                        previewLine.setForeground(java.awt.Color.GRAY);
+
+                        panel.add(nameLine);
+                        panel.add(previewLine);
+                        return panel;
+                    }
+                );
+            });
+        }
+        private void loadChatMessages(String customerKey) {
+        List<String[]> msgs = conversations.getOrDefault(customerKey, new ArrayList<>());
+
+        StringBuilder sb = new StringBuilder();
+        for (String[] row : msgs) {
+            String sender  = row[0];
+            String message = row[1];
+            String label   = sender.equalsIgnoreCase(mechanicname) ? "You" : sender;
+            sb.append(label).append(": ").append(message).append("\n\n");
+        }
+
+        String displayName = displayNames.getOrDefault(customerKey,
+            customerKey.substring(0, 1).toUpperCase() + customerKey.substring(1));
+
+        SwingUtilities.invokeLater(() -> {
+            messagearea2.setText(sb.toString());
+            messagearea2.setCaretPosition(messagearea2.getDocument().getLength());
+            jLabel77.setText(displayName);
+            jLabel76.setText("Active Conversation");
+        });
+
+        readConversations.add(customerKey);
+        updateChatHeadTable();
+    }
+
+    private void initChatHeadListener() {
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = jTable1.rowAtPoint(evt.getPoint());
+                if (row < 0) return;
+
+                Object val = jTable1.getValueAt(row, 0);
+                if (!(val instanceof String[])) return;
+
+                String nameLine = ((String[]) val)[0];
+
+                // Strip the dot prefix to get the display name
+                String displayName = nameLine.replaceAll("^[🔵\\s]+", "").trim();
+                String matchedKey  = displayName.toLowerCase();
+
+                if (conversations.containsKey(matchedKey)) {
+                    activeChatUser = matchedKey;
+                    loadChatMessages(matchedKey);
+                    jTabbedPane1.setSelectedIndex(3);
+                }
+            }
+        });
+    }
+            
+            
+    public void getdata() {
+        BufferedReader reader1 = null;
+        String line;
+        boolean firstRow = true;
+
+        try {
+            reader1 = new BufferedReader(new FileReader(assigntable));
+
+            DefaultTableModel requesttables = (DefaultTableModel) requesttable.getModel();
+            DefaultTableModel servicetables = (DefaultTableModel) servicetable.getModel();
+
+             // ✅ FIX: Clear both tables before repopulating
+        requesttables.setRowCount(0);
+        rowProblemsMap.clear();
+
+            String currentIdReq = "";
+            String vehicle = "";
+            String model_name = "";
+            String date = "";
+            String combinedProblems = "";
+
+            while ((line = reader1.readLine()) != null) {
+                String[] row = line.split(",");
+                if (firstRow) {
+                    firstRow = false;
+                    continue;
+                }
+                if (row.length < 6 || line.trim().isEmpty()) {
+                    continue;
+                }
+
+                if (row.length >= 8) {
+                    String idReq = row[6].trim();
+                    String username = row[2].trim();
+                    String car = row[3].trim();
+                    String problem = row[4].trim();
+                    String dateValue = row[5].trim();
+                    String mechanicName = row[7].trim();
+
+                    if (!mechanicName.equalsIgnoreCase(mechanicname)) {
+                        continue;
+                    }
+
+                    if (currentIdReq.equals(idReq)) {
+                        combinedProblems += ", " + problem;
+                    } else {
+                        if (!currentIdReq.isEmpty()) {
+                            
+                                int rowIndex = requesttables.getRowCount(); // get BEFORE adding
+
+    // ← ADD THIS
+    rowProblemsMap.put(rowIndex, combinedProblems.split(", "));
+    
+                            requesttables.addRow(new Object[]{currentIdReq, vehicle, model_name, combinedProblems, date, "", ""});
+                            servicetables.addRow(new Object[]{currentIdReq, vehicle, model_name, combinedProblems, date, "", "UPDATE STATUS"});
+                        }
+                        currentIdReq = idReq;
+                        vehicle = username;
+                        model_name = car;
+                        combinedProblems = problem;
+                        date = dateValue;
+                    }
+                }
+            }
+
+            // Last row
+            if (!currentIdReq.isEmpty()) {
+                
+                    int rowIndex = requesttables.getRowCount(); // BEFORE addRow
+
+    // ← ADD THIS
+    rowProblemsMap.put(rowIndex, combinedProblems.split(", "));
+
+                requesttables.addRow(new Object[]{currentIdReq, vehicle, model_name, combinedProblems, date, "", ""});
+                servicetables.addRow(new Object[]{currentIdReq, vehicle, model_name, combinedProblems, date, "", "UPDATE STATUS"});
+            }
+
+            table(); // ← no argument needed anymore
+
+            reader1.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(adminframe.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(adminframe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void workreq() {
+
+        DefaultTableModel model2 = (DefaultTableModel) requesttable.getModel();
+
+        try (
+                BufferedReader br1 = new BufferedReader(new FileReader(partsreq));
+                BufferedReader br2 = new BufferedReader(new FileReader(problemfile))) {
+
+            br1.readLine(); // skip header
+            br2.readLine(); // skip header
+
+            String line1;
+            String line2;
+
+            // 🔥 store rows to delete
+            List<Integer> rowsToDelete = new ArrayList<>();
+
+            int rowIndex = 0;
+
+            while ((line1 = br1.readLine()) != null
+                    && (line2 = br2.readLine()) != null) {
+
+                String[] cols1 = line1.split(",");
+
+                if (cols1.length >= 3) {
+
+                    String status = cols1[2].trim();
+
+                    System.out.println("Row " + rowIndex + " status: " + status);
+
+                    if (status.equalsIgnoreCase("YES")) {
+                        rowsToDelete.add(rowIndex);
+                    }
+                }
+
+                rowIndex++;
+            }
+
+            // 🔥 DELETE IN REVERSE ORDER (IMPORTANT)
+            Collections.sort(rowsToDelete, Collections.reverseOrder());
+
+           
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void table() {
+   
+        requesttable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 18));
+        requesttable.setRowHeight(30);
+        servicetable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 18));
+        servicetable.setRowHeight(30);
+
+        JComboBox<String> mechaniccombobox = new JComboBox<>();
+        mechaniccombobox.addItem("YES");
+        mechaniccombobox.addItem("NO");
+
+        // ✅ Per-row combobox — each row gets its own problems
+        JComboBox<String> perRowCombo = new JComboBox<>();
+        DefaultCellEditor perRowEditor = new DefaultCellEditor(perRowCombo) {
+            @Override
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                perRowCombo.removeAllItems(); // clear previous items
+                String[] problems = rowProblemsMap.get(row);
+                if (problems != null) {
+                    for (String p : problems) {
+                        perRowCombo.addItem(p);
+                    }
+                }
+                if (value != null) {
+                    perRowCombo.setSelectedItem(value);
+                }
+                return perRowCombo;
+            }
+        };
+
+        requesttable.getColumnModel().getColumn(3).setCellEditor(perRowEditor);
+        servicetable.getColumnModel().getColumn(3).setCellEditor(perRowEditor);
+
+        int shopButtonCol = requesttable.getColumnCount() - 2;
+        int newButtonCol = requesttable.getColumnCount() - 1;
+
+        cartshop cartForm = new cartshop();
+
+        requesttable.getColumnModel().getColumn(shopButtonCol).setCellRenderer(new ButtonRenderer("REQUEST PARTS"));
+        requesttable.getColumnModel().getColumn(shopButtonCol).setCellEditor(
+                new ButtonEditor(new JCheckBox(), requesttable, "REQUEST PARTS", (t, r) -> {
+                    cartForm.customerUsername = t.getValueAt(r, 1).toString();
+                    cartForm.mechanicName = mechanicname;
+                    new SHOPEE(cartForm).setVisible(true);
+                })
+        );
+
+        requesttable.getColumnModel().getColumn(newButtonCol).setCellRenderer(new ButtonRenderer("VIEW"));
+        requesttable.getColumnModel().getColumn(newButtonCol).setCellEditor(
+                new ButtonEditor(new JCheckBox(), requesttable, "ADD NOTES", (t, r) -> {
+                    new notes().setVisible(true);
+                })
+        );
+        // ✅ STATUS button on servicetable col 6
+        servicetable.getColumnModel().getColumn(6).setCellRenderer(new ButtonRenderer("UPDATE STATUS"));
+        servicetable.getColumnModel().getColumn(6).setCellEditor(
+                new ButtonEditor(new JCheckBox(), servicetable, "UPDATE STATUS", (t, r) -> {
+                String idReq    = t.getValueAt(r, 0).toString();
+                String customer = t.getValueAt(r, 1).toString();
+
+                // Look up which car slot (repairmanissuenumber) this idReq belongs to
+                int carSlot = 1;
+                try (BufferedReader br = new BufferedReader(new FileReader(problemfile))) {
+                    String line; boolean first = true;
+                    while ((line = br.readLine()) != null) {
+                        if (first) { first = false; continue; }
+                        String[] cols = line.split(",", -1);
+                        if (cols.length >= 7 &&
+                            cols[6].trim().equals(idReq) &&
+                            cols[2].trim().equalsIgnoreCase(customer)) {
+                            carSlot = Integer.parseInt(cols[0].trim()); // repairmanissuenumber
+                            break;
+                        }
+                    }
+                } catch (Exception ignored) {}
+
+                // Pass customer + car slot to updatestatus before opening
+                customerframe.username = customer;
+                updatestatus.targetCarSlot = carSlot;
+
+                updatestatus updatestatuss = new updatestatus();
+                updatestatuss.setLocationRelativeTo(null);
+                updatestatuss.setVisible(true);
+                })
+        );
+    }
+
+
+    public void updateworkorderInCSV(String idReq, String action) {
+
+        BufferedWriter bw = null;
+
+        try {
+            bw = new BufferedWriter(new FileWriter(partsreq, true)); // true = append mode
+
+            // write one row
+            bw.write(idReq + "," + mechanicname + "," + action);
+            bw.newLine();
+
+            System.out.println("Data added successfully!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bw != null) {
+                    bw.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+    }
+
+    public void loadparts() {
+    DefaultTableModel serviceModel = (DefaultTableModel) servicetable.getModel();
+
+    Map<String, List<String>> partsMap = new LinkedHashMap<>();
+
+    try (BufferedReader br = new BufferedReader(new FileReader("src\\cartrequest.csv"))) {
+        br.readLine(); // skip header
+        String line;
+        while ((line = br.readLine()) != null) {
+            line = line.trim();
+            // Skip empty lines and GRAND TOTAL lines
+            if (line.isEmpty() || line.toUpperCase().contains("GRAND")) {
+                continue;
+            }
+
+            String[] cols = line.split(",", -1); // -1 keeps trailing empty fields
+            if (cols.length < 8) continue;
+
+            String partName  = cols[2].trim();  // part name
+            String customer  = cols[6].trim();  // customer username
+            String mechanic  = cols[7].trim();  // mechanic name
+
+            if (partName.isEmpty()) continue;
+            if (!mechanic.equalsIgnoreCase(mechanicname)) continue;
+
+            // BUG FIX: key only on customer — idcustomer is unreliable/misaligned
+            // Use just customer to match against servicetable's customer column
+            partsMap.computeIfAbsent(customer.toLowerCase(), k -> new ArrayList<>()).add(partName);
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    // Step 2: Match rows in servicetable by customer name only
+    rowPartsMap.clear();
+    for (int i = 0; i < serviceModel.getRowCount(); i++) {
+        String rowCustomer = serviceModel.getValueAt(i, 1).toString().trim().toLowerCase();
+
+        List<String> parts = partsMap.get(rowCustomer); // match by customer only
+
+        if (parts != null && !parts.isEmpty()) {
+            String[] partsArray = parts.toArray(new String[0]);
+            rowPartsMap.put(i, partsArray);
+            serviceModel.setValueAt(partsArray[0], i, 5); // show first part in cell
+        }
+    }
+
+    // Step 3: Per-row combobox editor on col 5
+    JComboBox<String> partsCombo = new JComboBox<>();
+    DefaultCellEditor partsEditor = new DefaultCellEditor(partsCombo) {
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
+            partsCombo.removeAllItems();
+            String[] parts = rowPartsMap.get(row);
+            if (parts != null) {
+                for (String p : parts) {
+                    partsCombo.addItem(p);
+                }
+            }
+            if (value != null) {
+                partsCombo.setSelectedItem(value);
+            }
+            return partsCombo;
+        }
+    };
+
+     servicetable.getColumnModel().getColumn(5).setCellEditor(partsEditor);
+
+    // ✅ FIX: Add a renderer so the part name is always visible, not just on click
+    servicetable.getColumnModel().getColumn(5).setCellRenderer(
+        (table, value, isSelected, hasFocus, row, col) -> {
+            String text = (value != null) ? value.toString() : "";
+            // If this row has parts but cell is empty, show the first part
+            if (text.isEmpty()) {
+                String[] parts = rowPartsMap.get(row);
+                if (parts != null && parts.length > 0) {
+                    text = parts[0];
+                }
+            }
+            javax.swing.JLabel label = new javax.swing.JLabel(text);
+            label.setOpaque(true);
+            label.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+            label.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+            label.setFont(table.getFont());
+            label.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 4, 0, 4));
+            return label;
+        }
+    );
+
+    partsCombo.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+    servicetable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+    requesttable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+
+}
+
+
+    private void HActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HActionPerformed
+        // TODO add your handling code here:
+
+        jTabbedPane1.setSelectedIndex(4);
+            loadMechanicHistory();
+
+    }//GEN-LAST:event_HActionPerformed
+
+    public void loadMechanicHistory() {
+    String mechanic = mechanicname;
+
+    String[] columns = {"DATE", "PLATENUMBER", "CUSTOMER",
+                        "MODEL", "TOTAL SPENT", "PAID/NOT PAID", "COMPLETED"};
+
+    java.util.List<Object[]> rows = new java.util.ArrayList<>();
+
+    // ── 1. Read updatestatus.csv — only READY FOR PICKUP rows for this mechanic ──
+    // id(0), customer(1), repairman(2), diagnoses(3), timestamp(4), idcustomer(5)
+    // key = customer|idcustomer, value = [timestamp, diagnoses]
+    java.util.Map<String, String[]> readyMap = new java.util.LinkedHashMap<>();
+
+    try (BufferedReader br = new BufferedReader(new FileReader("src\\updatestatus.csv"))) {
+        String line; boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            if (line.trim().isEmpty()) continue;
+            String[] c = line.split(",", -1);
+            if (c.length < 6) continue;
+            if (!c[2].trim().equalsIgnoreCase(mechanic)) continue;
+            if (!c[3].trim().equalsIgnoreCase("READY FOR PICKUP")) continue;
+
+            String customer    = c[1].trim();
+            String idcustomer  = c[5].trim(); // slot 1,2,3
+            String timestamp   = c[4].trim();
+            String key         = customer + "|" + idcustomer;
+
+            // last row wins = latest READY FOR PICKUP per customer+slot
+            readyMap.put(key, new String[]{timestamp, customer, idcustomer});
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+
+    if (readyMap.isEmpty()) {
+        historytable.setModel(new DefaultTableModel(new Object[][]{}, columns));
+        COMPLETEDJOBS.setText("0");
+        return;
+    }
+
+    // ── 2. Read CAR REPAIRS.csv ──
+    // customerid(0), ownername(1), plateNum(2), model(3), brand(4),
+    // year(5), color(6), mileage(7), link(8)
+    // key = customer|customerid, value = [plateNum, model]
+    java.util.Map<String, String[]> carMap = new java.util.HashMap<>();
+    try (BufferedReader br = new BufferedReader(new FileReader("src\\CAR REPAIRS.csv"))) {
+        String line; boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            String[] c = line.split(",", -1);
+            if (c.length < 4) continue;
+            String key = c[1].trim() + "|" + c[0].trim(); // ownername|customerid
+            carMap.put(key, new String[]{c[2].trim(), c[3].trim()});
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+
+    // ── 3. Read reciept.csv — check paid ──
+    // id(0), samecustomerid(1), customer(2), DATE(3), payment(4), totalcost(5)
+    // key = customer|samecustomerid, value = [totalcost, paymentmethod]
+    java.util.Map<String, String[]> paidMap = new java.util.HashMap<>();
+    try (BufferedReader br = new BufferedReader(new FileReader("src\\reciept.csv"))) {
+        String line; boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            if (line.trim().isEmpty()) continue;
+            String[] c = line.split(",", 7);
+            if (c.length < 6) continue;
+            String key = c[2].trim() + "|" + c[1].trim(); // customer|samecustomerid
+            paidMap.put(key, new String[]{c[5].trim(), c[4].trim()});
+        }
+    } catch (Exception ignored) {}
+
+    // ── 4. Build one row per READY FOR PICKUP entry ──
+    for (java.util.Map.Entry<String, String[]> entry : readyMap.entrySet()) {
+        String key        = entry.getKey();          // customer|idcustomer
+        String[] info     = entry.getValue();
+        String timestamp  = info[0];
+        String customer   = info[1];
+        String idcustomer = info[2];
+
+        String[] car     = carMap.getOrDefault(key, new String[]{"N/A", "N/A"});
+        String plateNum  = car[0];
+        String model     = car[1];
+
+        boolean paid      = paidMap.containsKey(key);
+        String totalSpent = paid ? "₱" + paidMap.get(key)[0] : "₱0";
+        String paidStatus = paid ? "PAID" : "NOT PAID";
+
+        rows.add(new Object[]{
+            timestamp,   // DATE
+            plateNum,    // PLATENUMBER
+            customer,    // CUSTOMER
+            model,       // MODEL
+            totalSpent,  // TOTAL SPENT
+            paidStatus,  // PAID/NOT PAID
+            "COMPLETED"  // COMPLETED — only READY FOR PICKUP rows reach here
+        });
+    }
+
+    // ── 5. Set table ──
+    Object[][] data = rows.toArray(new Object[0][]);
+    DefaultTableModel model = new DefaultTableModel(data, columns) {
+        @Override public boolean isCellEditable(int r, int c) { return false; }
+    };
+    historytable.setModel(model);
+
+    // Color PAID green, NOT PAID red
+    historytable.setDefaultRenderer(Object.class,
+        new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(
+                    javax.swing.JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, col);
+                String paidVal = String.valueOf(table.getValueAt(row, 5));
+                if (!isSelected) {
+                    setBackground(paidVal.equals("PAID")
+                        ? new java.awt.Color(198, 239, 206)
+                        : new java.awt.Color(255, 199, 206));
+                }
+                return this;
+            }
+        });
+
+    // ── 6. Set COMPLETEDJOBS count ──
+    COMPLETEDJOBS.setText(String.valueOf(rows.size()));
+}
+    
+    private void SSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SSActionPerformed
+        // TODO add your handling code here:
+
+        jTabbedPane1.setSelectedIndex(2);
+    }//GEN-LAST:event_SSActionPerformed
+
+    private void DBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DBActionPerformed
+        // TODO add your handling code here:
+
+        jTabbedPane1.setSelectedIndex(0);
+    }//GEN-LAST:event_DBActionPerformed
+
+    private void MActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MActionPerformed
+        // TODO add your handling code here:
+
+        jTabbedPane1.setSelectedIndex(3);
+    }//GEN-LAST:event_MActionPerformed
+
+    private void PRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PRActionPerformed
+        // TODO add your handling code here:
+
+        jTabbedPane1.setSelectedIndex(1);
+    }//GEN-LAST:event_PRActionPerformed
+
+    private void jTextField21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField21ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField21ActionPerformed
+
+    private void messagetext2messagetextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_messagetext2messagetextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_messagetext2messagetextActionPerformed
+
+    private void messagesend2messagesendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_messagesend2messagesendActionPerformed
+        if (activeChatUser == null) {
+            JOptionPane.showMessageDialog(null, "Select a customer conversation first.");
+            return;
+        }
+
+        String message = messagetext2.getText().trim();
+        if (message.isEmpty()) return;
+
+        // Get the real display name of the customer for the customer column
+        String customerDisplay = displayNames.getOrDefault(activeChatUser, activeChatUser);
+
+        // Write: customer,mechanic,sender,message
+        java.io.File file = new java.io.File(MESSAGES_CSV);
+        boolean isNew = !file.exists() || file.length() == 0;
+
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(
+                new java.io.FileWriter(file, true))) {
+            if (isNew) pw.println("customer,mechanic,sender,message");
+            pw.printf("%s,%s,%s,%s%n", customerDisplay, mechanicname, mechanicname, message);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        messagetext2.setText("");
+        refreshMessages(); // reload immediately
+    }//GEN-LAST:event_messagesend2messagesendActionPerformed
+
+    private void jButton15jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15jButton9ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton15jButton9ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // Open the Login window
+        LOGIN loginWindow = new LOGIN();
+        loginWindow.setVisible(true);
+
+        // Close this frame
+        this.dispose();
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -74,11 +1755,138 @@ public class mechanicframe extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new mechanicframe().setVisible(true);
+                new mechanicframe(username).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel COMPLETEDJOBS;
+    private javax.swing.JButton DB;
+    private javax.swing.JPanel Dashboard;
+    private javax.swing.JButton H;
+    private javax.swing.JPanel History;
+    private javax.swing.JButton M;
+    private javax.swing.JPanel Messages;
+    private javax.swing.JButton PR;
+    private javax.swing.JPanel Partrequest;
+    private javax.swing.JButton SS;
+    private javax.swing.JPanel Servicestatus;
+    private javax.swing.JTable historytable;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel38;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel76;
+    private javax.swing.JLabel jLabel77;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel19;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane11;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField21;
+    private static javax.swing.JTextArea messagearea2;
+    private static javax.swing.JButton messagesend2;
+    private static javax.swing.JTextField messagetext2;
+    private javax.swing.JTextArea notifications;
+    private javax.swing.JTable requesttable;
+    private javax.swing.JTable servicetable;
+    private javax.swing.JTextArea worklist;
     // End of variables declaration//GEN-END:variables
+}
+// ================= RENDERER =================
+
+class ButtonRenderer extends JButton implements javax.swing.table.TableCellRenderer {
+
+    private String defaultLabel;
+
+    public ButtonRenderer(String defaultLabel) {
+        setOpaque(true);
+        this.defaultLabel = defaultLabel;
+    }
+
+    @Override
+    public java.awt.Component getTableCellRendererComponent(
+            JTable table, Object value,
+            boolean isSelected, boolean hasFocus,
+            int row, int column) {
+
+        setText((value == null || value.toString().trim().isEmpty())
+                ? defaultLabel
+                : value.toString());
+        return this;
+    }
+}
+
+// ================= EDITOR =================
+class ButtonEditor extends DefaultCellEditor {
+
+    private JButton button;
+    private String label;
+    private int row;
+    private JTable table;
+    private String defaultLabel;
+    private java.util.function.BiConsumer<JTable, Integer> onClick; // ✅ action passed in
+
+    public ButtonEditor(JCheckBox checkBox, JTable table, String defaultLabel,
+        java.util.function.BiConsumer<JTable, Integer> onClick) {
+        super(checkBox);
+        button = new JButton();
+        button.setOpaque(true);
+        this.table = table;
+        this.defaultLabel = defaultLabel;
+        this.onClick = onClick;
+
+        button.addActionListener(e -> {
+            fireEditingStopped();
+            onClick.accept(table, row); // ✅ fires whatever action you pass
+        });
+    }
+
+    @Override
+    public java.awt.Component getTableCellEditorComponent(
+            JTable table, Object value,
+            boolean isSelected, int row, int column) {
+        this.row = row;
+        label = (value == null || value.toString().trim().isEmpty())
+                ? defaultLabel
+                : value.toString();
+        button.setText(label);
+        return button;
+    }
+
+    @Override
+    public Object getCellEditorValue() {
+        return label;
+    }
 }

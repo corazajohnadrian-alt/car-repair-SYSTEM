@@ -1,0 +1,4 @@
+orderId,category,part,qty,price,total,customer,mechanic,mechaniccustomerspecificcustomer,idcustomer
+
+1,Transmission System,ATF,2,450,900,fhel,SEV,1
+,,,,GRAND TOTAL: ₱900,fhel,SEV,1
