@@ -268,36 +268,53 @@ public class LOGIN extends javax.swing.JFrame {
         
         username = txtusername.getText();
         password = txtpassword.getText();
-
+        
         //KANI IS CODE NI SA MYSQL
-        String querylogin = "Select * from accountdetails where accUsername = '"+ username+  "'"+" And accPassword = '" + password + "'"+";";
+        String querylogin = "Select * from accountdetails where accUsername = '"+ username+  "'"+" And accPassword = '" + password + "'"+";";        
+
         try {
              if (username.trim().isEmpty() || password.trim().isEmpty()) {
               JOptionPane.showMessageDialog(null, "Enter Username and Password");
               return;
              }
             pst = con.prepareStatement(querylogin);
-            
             ResultSet rs = pst.executeQuery();
-            
+
             if(!rs.next()) {
                 JOptionPane.showMessageDialog(null, "Invalid username or password");
             }
+            String role = rs.getString("acctype");
+
             
-            else{
             JOptionPane.showMessageDialog(null, "Account matched");
             
             switch (role) {
-            case "Customer":
-                new customerframe().setVisible(true);
-                break;
-            case "Mechanic":
-                new mechanicframe().setVisible(true);
-                break;
-            case "Admin":
-                new adminframe().setVisible(true);
-                break;
-        }
+                case "Customer":
+                    customerframe customer = new customerframe();
+                    customer.setVisible(true);
+                    customer.pack();
+                    customer.setLocationRelativeTo(null);
+                    this.dispose();
+                    break;
+                case "Mechanic":
+                    mechanicframe mechanic = new mechanicframe();
+                    mechanic.setVisible(true);
+                    mechanic.pack();
+                    mechanic.setLocationRelativeTo(null);
+                    this.dispose();
+                    break;
+                case "Admin":
+                    adminframe admin = new adminframe();
+                    admin.setVisible(true);
+                    admin.pack();
+                    admin.setLocationRelativeTo(null);
+                    this.dispose();
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Unknown role");
+        
+
+        
 
         this.dispose(); // Close login window
 

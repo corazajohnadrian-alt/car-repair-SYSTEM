@@ -107,7 +107,7 @@ public class RegisterForm extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 570, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         jPanel3.setBackground(new java.awt.Color(51, 204, 255));
@@ -304,7 +304,7 @@ public class RegisterForm extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtpassword, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Customercheckbox)
                     .addComponent(mechaniccheckbox)
@@ -334,14 +334,31 @@ public class RegisterForm extends javax.swing.JFrame {
                 .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(28, Short.MAX_VALUE))))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    private User user;
+   
+    public class User {
+        private String role;
 
+        // Constructor
+        public User(String role) {
+            this.role = role;
+        }
+
+        // Getter
+        public String getRole() {
+            return role;
+        }
+
+        // Optional: Setter
+        public void setRole(String role) {
+            this.role = role;
+        }
+    }
     private void jButtonRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegisterActionPerformed
         // TODO add your handling code here:
         String username;
@@ -349,7 +366,7 @@ public class RegisterForm extends javax.swing.JFrame {
         String Email;
         String fullname;
          String role = "";
-
+            
             if (Customercheckbox.isSelected()) {
                 role = "Customer";
             } else if (mechaniccheckbox.isSelected()) {
@@ -360,6 +377,9 @@ public class RegisterForm extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Please select a role!");
                 return;
             }
+            
+            // Create object using constructor
+            user = new User(role);
 
             JOptionPane.showMessageDialog(null, "Account registered as " + role, "Account rule", JOptionPane.INFORMATION_MESSAGE);
         
