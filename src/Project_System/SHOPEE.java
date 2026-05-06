@@ -752,6 +752,8 @@ public class SHOPEE extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
+    // halooooooooooooodsadasdasdsaodoaodwaoodwaodaow tryyy - Sherwin
+    
         private void loadInventoryData() {
         inventoryData.clear();
         try (java.io.BufferedReader br = new java.io.BufferedReader(
