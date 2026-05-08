@@ -1,2 +1,7 @@
 repairmanissuenumber,issuenumber,username,car,problems,date,idreq,repairman
-2,1,fhel,v12,fluid leak,May/06/2026,1,SEV
+1,1,adri,321,fan failure,May/09/2026,1,Sherwin
+2,1,adri,312,fan failure,May/09/2026,2,Edmer
+2,2,adri,312,poor fuel delivery,May/09/2026,2,Edmer
+3,1,adri,32,Radiator leak,May/09/2026,3,SEV
+3,2,adri,32,poor fuel delivery,May/09/2026,3,SEV
+3,3,adri,32,OTHERS,May/09/2026,3,SEV

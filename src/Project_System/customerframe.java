@@ -77,7 +77,9 @@ private MediaPlayer mediaPlayer;
     private int repairmanidissue = 0;
     private int currentServiceSlot = 1; // 1, 2, or 3 — which car button was clicked
     private String assignedMechanic = ""; // mechanic assigned to this customer
+    private String selectedTimeSlot = "";
 
+    
         // Messenger fields (mirrored from mechanicframe — mechanic is contact, customer is self)
     private java.util.Map<String, java.util.List<String[]>> conversations = new java.util.LinkedHashMap<>();
     private java.util.Map<String, String>                   displayNames   = new java.util.LinkedHashMap<>();
@@ -99,10 +101,14 @@ private MediaPlayer mediaPlayer;
     JButton[] buttons; //problems
     boolean clickbut = false; //problems
     private List<String> selectedProblems = new ArrayList<>();
+    private String selectedFilePath = "";
+    private String autoAssignedMechanic = ""; // repairman picked at submit time
+    private static final String[] ALL_MECHANICS = {"SEV", "Sherwin", "Edmer"};
 
     
     public customerframe(String username) {
         initComponents();
+        
         
         // System name for frame
         this.setTitle("FIXO: Framework for Interactive X-auto Operations");
@@ -123,6 +129,13 @@ private MediaPlayer mediaPlayer;
         this.username = username;
         buttongroup();
 
+            // Time slot toggle tracking + disable past slots
+        button1.addActionListener(evt -> { selectedTimeSlot = button1.isSelected() ? "7 AM - 9 AM"  : ""; });
+        button2.addActionListener(evt -> { selectedTimeSlot = button2.isSelected() ? "9 AM - 12 PM" : ""; });
+        button3.addActionListener(evt -> { selectedTimeSlot = button3.isSelected() ? "1 PM - 3 PM"  : ""; });
+        button4.addActionListener(evt -> { selectedTimeSlot = button4.isSelected() ? "3 PM - 5 PM"  : ""; });
+
+        datee.addPropertyChangeListener("date", evt -> checkAndDisableTimeSlots());
         
         loadAssignedMechanic(); // ← sets assignedMechanic + jLabel5 text
         assignlabel();
@@ -138,6 +151,7 @@ private MediaPlayer mediaPlayer;
         setSize(1280, 724);
         startRefreshingbutton(); // ADD THIS
                 initChatHeadListener(); // wire up jTable1 click → open chat
+               
 
 
         layercreatereq = new JPanel[]{vehicles, issue, Photos, schedule, SUMMARY};
@@ -238,8 +252,8 @@ private MediaPlayer mediaPlayer;
         txtareaissues = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         issuess = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        idontknow = new javax.swing.JButton();
+        others = new javax.swing.JButton();
         Photos = new Project_System.Design.RoundedPanel();
         videopanel = new javax.swing.JPanel();
         image = new javax.swing.JButton();
@@ -251,6 +265,10 @@ private MediaPlayer mediaPlayer;
         button2 = new javax.swing.JToggleButton();
         button4 = new javax.swing.JToggleButton();
         button3 = new javax.swing.JToggleButton();
+        label1 = new javax.swing.JLabel();
+        label2 = new javax.swing.JLabel();
+        label4 = new javax.swing.JLabel();
+        label3 = new javax.swing.JLabel();
         SUMMARY = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         summarypanel = new javax.swing.JTextArea();
@@ -932,9 +950,19 @@ private MediaPlayer mediaPlayer;
         ));
         jScrollPane3.setViewportView(issuess);
 
-        jButton1.setText("I DONT KNOW");
+        idontknow.setText("I DONT KNOW");
+        idontknow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                idontknowActionPerformed(evt);
+            }
+        });
 
-        jButton5.setText("OTHERS");
+        others.setText("OTHERS");
+        others.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                othersActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout issueLayout = new javax.swing.GroupLayout(issue);
         issue.setLayout(issueLayout);
@@ -948,9 +976,9 @@ private MediaPlayer mediaPlayer;
                         .addGap(18, 18, 18))
                     .addGroup(issueLayout.createSequentialGroup()
                         .addGap(55, 55, 55)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(idontknow, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(others, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(82, 82, 82)))
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(37, 37, 37))
@@ -965,8 +993,8 @@ private MediaPlayer mediaPlayer;
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
-                            .addComponent(jButton5))))
+                            .addComponent(idontknow)
+                            .addComponent(others))))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
 
@@ -1027,18 +1055,31 @@ private MediaPlayer mediaPlayer;
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel4.setText("TIMESLOT");
 
-        button1.setText("7 AM- 9 AM");
+        button1.setText("7 AM - 9 AM");
+        button1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button1ActionPerformed(evt);
+            }
+        });
 
-        button2.setText("9 AM- 12 PM");
+        button2.setText("9 AM - 12 PM");
         button2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 button2ActionPerformed(evt);
             }
         });
 
-        button4.setText("3 PM- 5 PM");
+        button4.setText("3 PM - 5 PM");
 
-        button3.setText("1 PM- 3 PM");
+        button3.setText("1 PM - 3 PM");
+
+        label1.setText("jLabel9");
+
+        label2.setText("jLabel10");
+
+        label4.setText("jLabel10");
+
+        label3.setText("jLabel9");
 
         javax.swing.GroupLayout timeslotLayout = new javax.swing.GroupLayout(timeslot);
         timeslot.setLayout(timeslotLayout);
@@ -1050,28 +1091,44 @@ private MediaPlayer mediaPlayer;
                 .addGap(320, 320, 320))
             .addGroup(timeslotLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(77, 77, 77)
-                .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
-                .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(61, 61, 61)
-                .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(67, 67, 67))
+                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(33, 33, 33)
+                .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29)
+                .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(38, 38, 38))
+            .addGroup(timeslotLayout.createSequentialGroup()
+                .addGap(73, 73, 73)
+                .addComponent(label1)
+                .addGap(150, 150, 150)
+                .addComponent(label2)
+                .addGap(148, 148, 148)
+                .addComponent(label3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(label4)
+                .addGap(85, 85, 85))
         );
         timeslotLayout.setVerticalGroup(
             timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(timeslotLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(label1)
                     .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                        .addComponent(label3)
+                        .addComponent(label4)
+                        .addComponent(label2)))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout scheduleLayout = new javax.swing.GroupLayout(schedule);
@@ -2146,13 +2203,135 @@ private MediaPlayer mediaPlayer;
         pack();
     }// </editor-fold>//GEN-END:initComponents
    
-    public void buttongroup(){
-                ButtonGroup group = new ButtonGroup();
+    
+    
+    private void checkAndDisableTimeSlots() {
+        java.util.Date chosen = datee.getDate();
 
-         group.add(button1);
-         group.add(button2);
-         group.add(button3);
-         group.add(button4); 
+        // Reset button labels first
+        button1.setText("7 AM - 9 AM");
+        button2.setText("9 AM - 12 PM");
+        button3.setText("1 PM - 3 PM");
+        button4.setText("3 PM - 5 PM");
+
+        if (chosen == null) {
+            button1.setEnabled(true);
+            button2.setEnabled(true);
+            button3.setEnabled(true);
+            button4.setEnabled(true);
+            return;
+        }
+
+        java.util.Calendar selected = java.util.Calendar.getInstance();
+        selected.setTime(chosen);
+        java.util.Calendar today = java.util.Calendar.getInstance();
+
+        boolean isToday =
+            selected.get(java.util.Calendar.YEAR)        == today.get(java.util.Calendar.YEAR) &&
+            selected.get(java.util.Calendar.DAY_OF_YEAR) == today.get(java.util.Calendar.DAY_OF_YEAR);
+
+        int hour = today.get(java.util.Calendar.HOUR_OF_DAY);
+
+        // Format chosen date to match how pictures.csv stores it  e.g. "May/08/2026"
+        String dateKey = new java.text.SimpleDateFormat("MMM/dd/yyyy").format(chosen);
+
+        // Load all mechanics
+        int totalMechanics = ALL_MECHANICS.length;
+
+
+        // Slot definitions: label, past-cutoff hour
+        String[] slotLabels  = {"7 AM - 9 AM", "9 AM - 12 PM", "1 PM - 3 PM", "3 PM - 5 PM"};
+        int[]    pastCutoffs = {9,              12,              15,             17};
+        javax.swing.JLabel[] labels = {label1, label2, label3, label4};
+
+        for (int s = 0; s < 4; s++) {
+            String slotLabel = slotLabels[s];
+            javax.swing.JToggleButton[] slotBtns = {button1, button2, button3, button4};
+
+            int busyCount = countBusyMechanics(dateKey, slotLabel);
+            int freeCount = totalMechanics - busyCount;
+            if (freeCount < 0) freeCount = 0;
+
+            boolean pastTime = isToday && hour >= pastCutoffs[s];
+            boolean canBook  = (totalMechanics == 0 || freeCount > 0) && !pastTime;
+
+            // ✅ Disable/enable the actual toggle button
+            slotBtns[s].setEnabled(canBook);
+            if (!canBook && slotBtns[s].isSelected()) {
+                slotBtns[s].setSelected(false);
+                selectedTimeSlot = "";
+            }
+
+            // ✅ Always set label text regardless of pastTime
+            if (pastTime) {
+                labels[s].setText("(past)");
+                labels[s].setForeground(java.awt.Color.GRAY);
+            } else if (totalMechanics == 0) {
+                labels[s].setText(slotLabels[s]);
+                labels[s].setForeground(java.awt.Color.DARK_GRAY);
+            } else if (freeCount > 0) {
+                labels[s].setText("(" + freeCount + " mechanic"
+                    + (freeCount > 1 ? "s" : "") + " free)");
+                labels[s].setForeground(new java.awt.Color(0, 153, 0));
+            } else {
+                labels[s].setText("(fully booked)");
+                labels[s].setForeground(java.awt.Color.RED);
+            }
+        }
+    }
+    
+    private java.util.List<String> loadAllMechanics() {
+        java.util.List<String> list = new java.util.ArrayList<>();
+        try (java.io.BufferedReader br = new java.io.BufferedReader(
+                new java.io.FileReader("src\\users.csv"))) {
+            String line;
+            boolean first = true;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (first) { first = false; continue; }
+                String[] c = line.split(",", -1);
+                // cols: username(0), password(1), role(2)
+                if (c.length >= 3 && c[2].trim().equalsIgnoreCase("mechanic")) {
+                    list.add(c[0].trim());
+                }
+            }
+        } catch (Exception e) { /* ignore if absent */ }
+        return list;
+    }
+    
+    private int countBusyMechanics(String dateKey, String slotLabel) {
+        java.util.Set<String> busy = new java.util.HashSet<>();
+        java.io.File file = new java.io.File("src\\pictures.csv");
+        if (!file.exists()) return 0;
+        try (java.io.BufferedReader br = new java.io.BufferedReader(
+                new java.io.FileReader(file))) {
+            String line;
+            boolean first = true;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (first) { first = false; continue; }
+                String[] c = line.split(",", -1);
+                if (c.length < 7) continue;
+                String mechanic = c[3].trim();
+                String rowDate  = c[5].trim();
+                String rowSlot  = c[6].trim();
+                if (rowDate.equalsIgnoreCase(dateKey) &&
+                    rowSlot.equalsIgnoreCase(slotLabel) &&
+                    !mechanic.isEmpty() && !mechanic.equalsIgnoreCase("N/A")) {
+                    busy.add(mechanic.toLowerCase());
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return busy.size();
+    }
+   
+    public void buttongroup(){
+        buttonGroup2.add(button1);
+        buttonGroup2.add(button2);
+        buttonGroup2.add(button3);
+        buttonGroup2.add(button4);
     }
     
     private void refreshMessages() {
@@ -2364,6 +2543,64 @@ private MediaPlayer mediaPlayer;
             }
 
     }
+    
+    private void refreshTimeSlots() {
+     java.util.Date picked = datee.getDate();
+     if (picked == null) return;
+     String dateStr = new java.text.SimpleDateFormat("MMM/dd/yyyy").format(picked);
+
+    javax.swing.JToggleButton[] slotBtns = {button1, button2, button3, button4};
+    String[] slotNames = {
+        "7:00 AM - 9:00 AM",
+        "9:00 AM - 12:00 PM",
+        "1:00 PM - 3:00 PM",
+        "3:00 PM - 6:00 PM"
+    };
+
+    for (int i = 0; i < slotBtns.length; i++) {
+        final String slotName = slotNames[i];
+        slotBtns[i].addActionListener(e -> {
+            // Deselect all others
+            for (javax.swing.JToggleButton sb : slotBtns) {
+                if (sb != e.getSource()) sb.setSelected(false);
+            }
+            // If this one is now selected, store the slot
+            if (((javax.swing.JToggleButton) e.getSource()).isSelected()) {
+                selectedTimeSlot = slotName;
+            } else {
+                selectedTimeSlot = ""; // user untoggled
+            }
+        });
+    }
+    }
+
+ /**
+  * Reads pictures.csv and returns which mechanics are already booked
+  * for the given date + time slot.
+  */
+    private java.util.List<String> getBookedMechanics(String date, String timeslot) {
+        java.util.List<String> booked = new java.util.ArrayList<>();
+        java.io.File file = new java.io.File("src\\pictures.csv");
+        if (!file.exists()) return booked;
+
+        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line; boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                if (line.trim().isEmpty()) continue;
+                String[] c = line.split(",", -1);
+                // id(0), repairmanissuenumber(1), customer(2), mechanic(3), pathfile(4), date(5), time(6)
+                if (c.length >= 7
+                    && c[5].trim().equalsIgnoreCase(date)
+                    && c[6].trim().equalsIgnoreCase(timeslot)
+                    && !c[3].trim().isEmpty()) {
+                    booked.add(c[3].trim());
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return booked;
+    }
+    
     private void loadAssignedMechanic() {
             // Read problems.csv — col[2]=username, col[7]=mechanic
             String problemsPath = "src\\problems.csv";
@@ -2428,7 +2665,15 @@ private MediaPlayer mediaPlayer;
         
     });
     refreshTimer.start();
-}
+}   
+    private void refreshIssueTextArea() {
+        txtareaissues.setText("");
+        int i = 1;
+        for (String p : selectedProblems) {
+            txtareaissues.append(i + ". " + p + "\n");
+            i++;
+        }
+    }
     public void problemscsv(){
         List<String> issueNames = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader("src\\issues.csv"))) {
@@ -2915,59 +3160,207 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
         // TODO add your handling code here:
     }//GEN-LAST:event_text2messageMouseClicked
    public void saveAllToCSV(int repairmanidissue) {
-        java.time.LocalDate today = java.time.LocalDate.now();
-        java.time.format.DateTimeFormatter fmt =
-            java.time.format.DateTimeFormatter.ofPattern("MMM/dd/yyyy");
-        String dateStr = today.format(fmt);
-
-        // ── Look up the car model from CAR REPAIRS.csv using the slot (customerid = repairmanidissue) ──
-        String carName = "N/A";
-        try (BufferedReader br = new BufferedReader(new FileReader(carrepairr))) {
-            String line; boolean first = true;
-            while ((line = br.readLine()) != null) {
-                if (first) { first = false; continue; }
-                String[] c = line.split(",", -1);
-                if (c.length < 4) continue;
-                // col[0]=customerid, col[1]=ownername, col[3]=model
-                if (c[0].trim().equals(String.valueOf(repairmanidissue)) &&
-                    c[1].trim().equalsIgnoreCase(username)) {
-                    carName = c[3].trim(); // model
-                    break;
-                }
+    java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("MMM/dd/yyyy");
+    String dateStr = (datee.getDate() != null)
+        ? fmt.format(datee.getDate())
+        : fmt.format(new java.util.Date()); 
+ 
+    // ── Lookup car model ──────────────────────────────────────────
+    String carName = "N/A";
+    try (java.io.BufferedReader br = new java.io.BufferedReader(
+            new java.io.FileReader(carrepairr))) {
+        String line; boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            String[] c = line.split(",", -1);
+            if (c.length < 4) continue;
+            if (c[0].trim().equals(String.valueOf(repairmanidissue)) &&
+                c[1].trim().equalsIgnoreCase(username)) {
+                carName = c[3].trim();
+                break;
+            }
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+ 
+    System.out.println("Car for slot " + repairmanidissue + ": " + carName);
+ 
+    // ── Generate idreq ────────────────────────────────────────────
+    int idreq = 1;
+    java.io.File f = new java.io.File(problemsfile);
+    if (f.exists()) {
+        try (java.io.BufferedReader br = new java.io.BufferedReader(
+                new java.io.FileReader(f))) {
+            String line, last = null;
+            while ((line = br.readLine()) != null)
+                if (!line.trim().isEmpty()) last = line;
+            if (last != null && !last.startsWith("repairman")) {
+                try { idreq = Integer.parseInt(last.split(",")[1].trim()) + 1; }
+                catch (Exception ignored) {}
             }
         } catch (Exception e) { e.printStackTrace(); }
-
-        System.out.println("Car for slot " + repairmanidissue + ": " + carName);
-
-        // ── Generate idreq ──
-        int idreq = 1;
-        java.io.File f = new java.io.File(problemsfile);
-        if (f.exists()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-                String line; String last = null;
-                while ((line = br.readLine()) != null)
-                    if (!line.trim().isEmpty()) last = line;
-                if (last != null && !last.startsWith("repairman")) {
-                    try { idreq = Integer.parseInt(last.split(",")[1].trim()) + 1; }
-                    catch (Exception ignored) {}
-                }
-            } catch (Exception e) { e.printStackTrace(); }
+    }
+ 
+    System.out.println("Generated idreq: " + idreq);
+ 
+    // ── AUTO-ASSIGN MECHANIC ──────────────────────────────────────
+    String mechanic = autoAssignMechanic();
+ 
+        if (mechanic.equals("PENDING")) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                "All mechanics are currently busy at your chosen time slot.\n"
+              + "Your request is in the queue — a mechanic will be\n"
+              + "assigned as soon as one becomes available.");
+            mechanic = "";
+        } else if (!mechanic.isEmpty()) {
+            assignedMechanic = mechanic;
+            jLabel5.setText(assignedMechanic);
         }
-
-        System.out.println("Generated idreq: " + idreq);
-
+        System.out.println("Mechanic to assign: " + mechanic);
+ 
+        // ── Save each problem row via problembuttons ──────────────────
         for (int i = 0; i < selectedProblems.size(); i++) {
             problembuttons.savetocsvcustomer(
                 repairmanidissue,
                 i + 1,
                 username,
-                carName,       // ← was hardcoded "toyota", now reads from CAR REPAIRS.csv
+                carName,
                 selectedProblems.get(i),
                 dateStr,
                 idreq
             );
         }
+
+        // ── Auto-assign mechanic and save to pictures.csv ──
+    if (mechanic.isEmpty() && datee.getDate() != null && !selectedTimeSlot.isEmpty()) {
+        dateStr = new java.text.SimpleDateFormat("MMM/dd/yyyy").format(datee.getDate());
+
+        java.util.List<String> booked = getBookedMechanics(dateStr, selectedTimeSlot);
+        java.util.List<String> free   = new java.util.ArrayList<>();
+        for (String m : ALL_MECHANICS) {
+            if (!booked.contains(m)) free.add(m);
+        }
+
+        if (!free.isEmpty()) {
+            autoAssignedMechanic = free.get(new java.util.Random().nextInt(free.size()));
+            System.out.println("Auto-assigned: " + autoAssignedMechanic);
+
+            saveToPicturesCSV(repairmanidissue, dateStr, selectedTimeSlot, autoAssignedMechanic);
+            updateMechanicInProblemsCSV(repairmanidissue, autoAssignedMechanic);
+
+            assignedMechanic = autoAssignedMechanic;
+            jLabel5.setText(assignedMechanic);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "No mechanics available for that slot. Please go back and pick another.");
+        }
     }
+ 
+    // ── Patch repairman column in problems.csv ────────────────────
+    // problembuttons.savetocsvcustomer writes col[7] as empty or "N/A".
+    // We rewrite the CSV and fill in col[7] for rows that match this
+    // repairmanidissue + username + idreq.
+    if (!mechanic.isEmpty()) {
+        patchRepairmanInCSV(repairmanidissue, idreq, mechanic);
+        savePictureToCSV(repairmanidissue, idreq, mechanic);
+    }
+}
+    private void saveToPicturesCSV(int repairmanIssueNum, String date, String timeslot, String mechanic) {
+    java.io.File file = new java.io.File("src\\pictures.csv");
+    boolean isNew = !file.exists() || file.length() == 0;
+
+    int nextId = 1;
+    if (!isNew) {
+        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line, last = null;
+            while ((line = br.readLine()) != null)
+                if (!line.trim().isEmpty()) last = line;
+            if (last != null && !last.startsWith("id")) {
+                try { nextId = Integer.parseInt(last.split(",")[0].trim()) + 1; }
+                catch (Exception ignored) {}
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(file, true))) {
+        if (isNew) pw.println("id,repairmanissuenumber,customer,mechanic,pathfile,date,time");
+        pw.printf("%d,%d,%s,%s,%s,%s,%s%n",
+            nextId, repairmanIssueNum, username, mechanic, "", date, timeslot);
+        System.out.println("Saved to pictures.csv → " + mechanic + " | " + date + " | " + timeslot);
+    } catch (Exception e) { e.printStackTrace(); }
+}
+
+    private void updateMechanicInProblemsCSV(int repairmanIssueNum, String mechanic) {
+        java.io.File file = new java.io.File(problemsfile);
+        if (!file.exists()) return;
+
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) lines.add(line);
+        } catch (Exception e) { e.printStackTrace(); return; }
+
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(file, false))) {
+            for (String line : lines) {
+                String[] c = line.split(",", -1);
+
+                // Skip header
+                if (c[0].equalsIgnoreCase("repairmanissuenumber")) {
+                    pw.println(line);
+                    continue;
+                }
+
+                // ✅ If row is missing repairman column, pad it to 8
+                if (c.length < 8) {
+                    c = java.util.Arrays.copyOf(c, 8);
+                    c[7] = ""; // blank by default
+                }
+
+                // ✅ Now fill in the mechanic for the matching row
+                if (c[0].trim().equals(String.valueOf(repairmanIssueNum))
+                    && c[2].trim().equalsIgnoreCase(username)) {
+                    c[7] = mechanic;
+                }
+
+                pw.println(String.join(",", c));
+            }
+            System.out.println("Updated problems.csv → repairman set to " + mechanic);
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    private void patchRepairmanInCSV(int repairmanidissue, int idreq, String mechanic) {
+    java.io.File file = new java.io.File(problemsfile);
+    if (!file.exists()) return;
+ 
+    java.util.List<String> lines = new java.util.ArrayList<>();
+    try (java.io.BufferedReader br = new java.io.BufferedReader(
+            new java.io.FileReader(file))) {
+        String line;
+        while ((line = br.readLine()) != null)
+            lines.add(line);
+    } catch (Exception e) { e.printStackTrace(); return; }
+ 
+    try (java.io.PrintWriter pw = new java.io.PrintWriter(
+            new java.io.FileWriter(file, false))) { // overwrite
+        for (String line : lines) {
+            String[] c = line.split(",", -1);
+            // Check if this row matches our new submission
+            if (c.length >= 8
+                    && !c[0].trim().equalsIgnoreCase("repairmanissuenumber") // skip header
+                    && c[0].trim().equals(String.valueOf(repairmanidissue))
+                    && c[2].trim().equalsIgnoreCase(username)
+                    && c[6].trim().equals(String.valueOf(idreq))
+                    && c[7].trim().isEmpty()) {           // only blank ones
+                c[7] = mechanic;
+                pw.println(String.join(",", c));
+            } else {
+                pw.println(line);
+            }
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+ 
+    System.out.println("Patched repairman '" + mechanic
+                     + "' into problems.csv for idreq=" + idreq);
+}
     
    
     
@@ -3021,6 +3414,17 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
 
         return; // stop here, don't fall through
     }
+    
+    if (numlayercreatereq == 3) {
+    if (datee.getDate() == null) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please select a date first.");
+        return;
+    }
+            if (selectedTimeSlot.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Please select a time slot.");
+                return;
+            }
+        }
 
     // ── Progress bar update ──────────────────────────────────
     int current = jProgressBar1.getValue();
@@ -3078,6 +3482,7 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
         sb.append("  MODEL     : ").append(carName).append("\n");
         sb.append("  PLATE #   : ").append(plateNum).append("\n");
         sb.append("  DATE      : ").append(selectedDate).append("\n");
+        sb.append("  TIME SLOT : ").append(selectedTimeSlot).append("\n"); // ADD THIS
         sb.append("══════════════════════════════\n");
         sb.append("  ISSUES REPORTED:\n");
         sb.append("──────────────────────────────\n");
@@ -3162,7 +3567,7 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
     }//GEN-LAST:event_ADDCARActionPerformed
      
     private void startRefreshingbutton() {
-        javax.swing.Timer refreshTimer = new javax.swing.Timer(1000, e -> {
+        refreshTimer = new javax.swing.Timer(1000, e -> {
         try (BufferedReader reader = new BufferedReader(new FileReader(carrepairr))) {
                 String line;
 
@@ -3317,7 +3722,8 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
             if (c.length < 8) continue;
             // cols: repairmanissuenumber(0), issuenumber(1), username(2), car(3),
             //       problems(4), date(5), idreq(6), repairman(7)
-            if (c[2].trim().equalsIgnoreCase(customer)) {
+            if (c[2].trim().equalsIgnoreCase(customer) &&
+                c[0].trim().equals(String.valueOf(carButtonSlot))) {
                 repairmanIssueNum = Integer.parseInt(c[0].trim());
                 break; // take the first matching row
             }
@@ -3370,6 +3776,118 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
             "Your car is READY FOR PICKUP!\nPlease proceed to payment before vehicle release.\nTime: " + readyTimestamp);
     }
 }
+    private String autoAssignMechanic() {
+ 
+        // ── Step A: Get all mechanics ──
+        java.util.List<String> mechanicList = loadAllMechanics();
+
+        // Fallback: collect from problems.csv if users.csv gave nothing
+        if (mechanicList.isEmpty()) {
+            java.util.Set<String> seen = new java.util.LinkedHashSet<>();
+            try (java.io.BufferedReader br = new java.io.BufferedReader(
+                    new java.io.FileReader(problemsfile))) {
+                String line; boolean first = true;
+                while ((line = br.readLine()) != null) {
+                    if (first) { first = false; continue; }
+                    String[] c = line.split(",", -1);
+                    if (c.length >= 8 && !c[7].trim().isEmpty())
+                        seen.add(c[7].trim());
+                }
+            } catch (Exception ignored) {}
+            mechanicList.addAll(seen);
+        }
+
+        if (mechanicList.isEmpty()) return "";
+
+        // ── Step B: Booking date + time slot chosen by customer ──
+        String bookingDate = "";
+        if (datee.getDate() != null) {
+            bookingDate = new java.text.SimpleDateFormat("MMM/dd/yyyy")
+                              .format(datee.getDate());
+        }
+        String bookingSlot = selectedTimeSlot; // e.g. "7 AM - 9 AM"
+
+        // ── Step C: Find mechanics busy at that date+slot from pictures.csv ──
+        java.util.Set<String> busyAtSlot = new java.util.HashSet<>();
+        if (!bookingDate.isEmpty() && !bookingSlot.isEmpty()) {
+            java.io.File file = new java.io.File("src\\pictures.csv");
+            if (file.exists()) {
+                try (java.io.BufferedReader br = new java.io.BufferedReader(
+                        new java.io.FileReader(file))) {
+                    String line; boolean first = true;
+                    while ((line = br.readLine()) != null) {
+                        line = line.trim();
+                        if (line.isEmpty()) continue;
+                        if (first) { first = false; continue; }
+                        String[] c = line.split(",", -1);
+                        if (c.length < 7) continue;
+                        String rowMechanic = c[3].trim();
+                        String rowDate     = c[5].trim();
+                        String rowSlot     = c[6].trim();
+                        if (rowDate.equalsIgnoreCase(bookingDate) &&
+                            rowSlot.equalsIgnoreCase(bookingSlot) &&
+                            !rowMechanic.isEmpty() && !rowMechanic.equalsIgnoreCase("N/A")) {
+                            busyAtSlot.add(rowMechanic.toLowerCase());
+                        }
+                    }
+                } catch (Exception e) { e.printStackTrace(); }
+            }
+        }
+
+        // ── Step D: Count active jobs per mechanic from problems.csv ──
+        java.util.Map<String, Integer> jobCount = new java.util.LinkedHashMap<>();
+        for (String m : mechanicList) jobCount.put(m, 0);
+        try (java.io.BufferedReader br = new java.io.BufferedReader(
+                new java.io.FileReader(problemsfile))) {
+            String line; boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] c = line.split(",", -1);
+                if (c.length < 8) continue;
+                String mech = c[7].trim();
+                if (!mech.isEmpty() && jobCount.containsKey(mech))
+                    jobCount.put(mech, jobCount.get(mech) + 1);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        // ── Step E: Try SEV first ──
+        final String DEFAULT_MECHANIC = "SEV"; // ← change to your default mechanic's username
+        String chosen = "";
+
+        if (mechanicList.contains(DEFAULT_MECHANIC) &&
+            !busyAtSlot.contains(DEFAULT_MECHANIC.toLowerCase())) {
+            chosen = DEFAULT_MECHANIC;
+            System.out.println("-> SEV is free — assigned to SEV");
+        } else {
+            System.out.println("  SEV is busy at " + bookingDate + " " + bookingSlot
+                             + " — finding another mechanic...");
+            // Pick the free mechanic with the fewest jobs
+            int lowestCount = Integer.MAX_VALUE;
+            for (String m : mechanicList) {
+                if (busyAtSlot.contains(m.toLowerCase())) {
+                    System.out.println("  " + m + " BUSY — skipped");
+                    continue;
+                }
+                int cnt = jobCount.getOrDefault(m, 0);
+                System.out.println("  " + m + " free, active jobs: " + cnt);
+                if (cnt < lowestCount) {
+                    lowestCount = cnt;
+                    chosen = m;
+                }
+            }
+        }
+
+        // ── Step F: All busy → Pending ──
+        if (chosen.isEmpty()) {
+            System.out.println("-> ALL MECHANICS BUSY — Pending");
+            return "PENDING";
+        }
+
+        System.out.println("-> Auto-assigned: " + chosen
+                         + " (" + bookingDate + " | " + bookingSlot + ")");
+        return chosen;
+    }
+    
     
     private void handleAddCar(javax.swing.JButton btn, int customerid) {
     // repairmanissuenumber = customerid directly (addcar1→1, addcar2→2, addcar3→3)
@@ -3399,7 +3917,7 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
             repairmanidissue = repairmanIssueNum; // addcar1→1, addcar2→2, addcar3→3
 
             int current = jProgressBar1.getValue();
-            jProgressBar1.setValue(current + 33);
+            jProgressBar1.setValue(current + 25);
 
             numlayercreatereq++;
             if (numlayercreatereq >= layercreatereq.length) numlayercreatereq = 0;
@@ -3769,6 +4287,7 @@ handleServiceCar(3);
 
                 String path = selectedFile.getAbsolutePath().toLowerCase();
 
+                 selectedFilePath = selectedFile.getAbsolutePath(); 
                 // IMAGE
                 if (path.endsWith(".jpg") ||
                     path.endsWith(".jpeg") ||
@@ -3821,9 +4340,95 @@ handleServiceCar(3);
         }
     }//GEN-LAST:event_imageActionPerformed
 
+    private void savePictureToCSV(int repairmanidissue, int idreq, String mechanic) {
+        if (selectedFilePath.isEmpty()) return; // nothing was uploaded — skip
+ 
+        String picturesPath = "src\\pictures.csv";
+        java.io.File file   = new java.io.File(picturesPath);
+        boolean isNew       = !file.exists() || file.length() == 0;
+ 
+        // Get next id
+        int nextId = 1;
+        if (!isNew) {
+            try (java.io.BufferedReader br = new java.io.BufferedReader(
+                    new java.io.FileReader(file))) {
+                String line, last = null;
+                while ((line = br.readLine()) != null)
+                    if (!line.trim().isEmpty()) last = line;
+                if (last != null && !last.toLowerCase().startsWith("id")) {
+                    try { nextId = Integer.parseInt(last.split(",")[0].trim()) + 1; }
+                    catch (Exception ignored) {}
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+ 
+        // Date and time
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        String dateStr = now.format(java.time.format.DateTimeFormatter.ofPattern("MMM/dd/yyyy"));
+        String timeStr = selectedTimeSlot.isEmpty()
+                ? now.format(java.time.format.DateTimeFormatter.ofPattern("hh:mm a"))
+                : selectedTimeSlot; 
+        
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(
+                new java.io.FileWriter(file, true))) { // append
+ 
+            if (isNew) pw.println("id,repairmanissuenumber,customer,mechanic,pathfile,date,time");
+ 
+            // id, repairmanissuenumber, customer, mechanic, pathfile, date, time
+            pw.printf("%d,%d,%s,%s,%s,%s,%s%n",
+                nextId,
+                repairmanidissue,
+                username,
+                mechanic.isEmpty() ? "N/A" : mechanic,
+                selectedFilePath,
+                dateStr,
+                timeStr
+            );
+ 
+            System.out.println("Saved picture path to pictures.csv: " + selectedFilePath);
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+ 
+        // Reset after saving so it doesn't carry over to the next request
+        selectedFilePath = "";
+    }
     private void button2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_button2ActionPerformed
+
+    private void idontknowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idontknowActionPerformed
+            String problem = "I DONT KNOW";
+        if (selectedProblems.contains(problem)) {
+            selectedProblems.remove(problem);
+            idontknow.setBackground(new Color(200, 200, 200));
+            idontknow.setForeground(java.awt.Color.DARK_GRAY);
+        } else {
+            selectedProblems.add(problem);
+            idontknow.setBackground(new Color(0, 153, 153));
+            idontknow.setForeground(java.awt.Color.WHITE);
+        }
+        refreshIssueTextArea();
+    }//GEN-LAST:event_idontknowActionPerformed
+
+    private void othersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_othersActionPerformed
+        String problem = "OTHERS";
+    if (selectedProblems.contains(problem)) {
+        selectedProblems.remove(problem);
+        others.setBackground(new Color(200, 200, 200));
+        others.setForeground(java.awt.Color.DARK_GRAY);
+    } else {
+        selectedProblems.add(problem);
+        others.setBackground(new Color(0, 153, 153));
+        others.setForeground(java.awt.Color.WHITE);
+    }
+    refreshIssueTextArea();
+    }//GEN-LAST:event_othersActionPerformed
+
+    private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_button1ActionPerformed
     public boolean isReadyForPickup(int carSlot) {
     String customer = customerframe.username;
 
@@ -4383,10 +4988,10 @@ handleServiceCar(3);
     private javax.swing.JButton edits3;
     private javax.swing.JPanel history;
     private javax.swing.JTable historytable;
+    private javax.swing.JButton idontknow;
     private javax.swing.JButton image;
     private javax.swing.JPanel issue;
     private javax.swing.JTable issuess;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton15;
@@ -4394,7 +4999,6 @@ handleServiceCar(3);
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
@@ -4450,12 +5054,17 @@ handleServiceCar(3);
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTable jTable1;
+    private javax.swing.JLabel label1;
+    private javax.swing.JLabel label2;
+    private javax.swing.JLabel label3;
+    private javax.swing.JLabel label4;
     private javax.swing.JTextArea materialarea;
     private javax.swing.JPanel message;
     private javax.swing.JButton next;
     private javax.swing.JTextArea notifarea;
     private javax.swing.JLabel numofcarinprogress;
     private javax.swing.JLabel numofcarinreadytopickup;
+    private javax.swing.JButton others;
     private javax.swing.JTable partslist;
     private javax.swing.JButton paybutton;
     private javax.swing.JPanel payment;
