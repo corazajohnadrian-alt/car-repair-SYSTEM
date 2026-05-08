@@ -13,6 +13,7 @@ import static Project_System.addcar.file;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -30,11 +31,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -47,8 +56,11 @@ import javax.swing.table.TableCellRenderer;
 public class customerframe extends javax.swing.JFrame {
 
     
-    static String username; // FOR CHATT
+    static String username = "adri"; // FOR CHATT
 
+            File carpic;
+            private JFXPanel fxPanel;
+private MediaPlayer mediaPlayer;
     private Timer refreshTimer; //FOR CHATT
     static String carrepairr = "src\\CAR REPAIRS.csv"; //THIS IS FOR THE CAR REPAIRS
     static String problemsfile = "src\\problems.csv"; // PROBLEMS FOR EACH CAR SAVED IN CSV
@@ -109,12 +121,17 @@ public class customerframe extends javax.swing.JFrame {
         loadDashboard();    
         problemscsv();
         this.username = username;
+        buttongroup();
 
         
         loadAssignedMechanic(); // ← sets assignedMechanic + jLabel5 text
         assignlabel();
         visibles();
-
+        
+        Platform.setImplicitExit(false);
+        fxPanel = new JFXPanel();
+        videopanel.setLayout(new java.awt.BorderLayout());
+        videopanel.add(fxPanel, java.awt.BorderLayout.CENTER);
 
         startRefreshing(); // ADD THIS
         this.setLocationRelativeTo(null);//CENTER form in the screen
@@ -123,7 +140,7 @@ public class customerframe extends javax.swing.JFrame {
                 initChatHeadListener(); // wire up jTable1 click → open chat
 
 
-        layercreatereq = new JPanel[]{vehicles, issue, schedule, SUMMARY};
+        layercreatereq = new JPanel[]{vehicles, issue, Photos, schedule, SUMMARY};
         layerserv = new JPanel[]{servpanel1, servpanel2};
         paymentlayer = new JPanel[]{paymentlayer1, paymentlayer2};
         
@@ -148,6 +165,8 @@ public class customerframe extends javax.swing.JFrame {
             public void removeUpdate(javax.swing.event.DocumentEvent e) { update(); }
             public void changedUpdate(javax.swing.event.DocumentEvent e) { update(); }
         });
+        
+
     }
 
     /**
@@ -205,6 +224,7 @@ public class customerframe extends javax.swing.JFrame {
         jLabel14 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
         createreqpanel = new javax.swing.JLayeredPane();
         vehicles = new Project_System.Design.RoundedPanel();
         addcar1 = new javax.swing.JButton();
@@ -218,8 +238,19 @@ public class customerframe extends javax.swing.JFrame {
         txtareaissues = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         issuess = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        Photos = new Project_System.Design.RoundedPanel();
+        videopanel = new javax.swing.JPanel();
+        image = new javax.swing.JButton();
         schedule = new javax.swing.JPanel();
         datee = new com.toedter.calendar.JDateChooser();
+        timeslot = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        button1 = new javax.swing.JToggleButton();
+        button2 = new javax.swing.JToggleButton();
+        button4 = new javax.swing.JToggleButton();
+        button3 = new javax.swing.JToggleButton();
         SUMMARY = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         summarypanel = new javax.swing.JTextArea();
@@ -710,31 +741,38 @@ public class customerframe extends javax.swing.JFrame {
         jLabel13.setText("SCHEDULE");
 
         jLabel14.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel14.setText("REVIEW");
+        jLabel14.setText("SUMMARY");
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel11.setText("VEHICLE");
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel12.setText("ISSUE");
+        jLabel12.setText("PICTURE");
+
+        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        jLabel16.setText("ISSUE");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(75, 75, 75)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 755, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(25, 25, 25)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel11)
-                        .addGap(127, 127, 127)
+                        .addGap(104, 104, 104)
+                        .addComponent(jLabel16)
+                        .addGap(100, 100, 100)
                         .addComponent(jLabel12)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel13)
-                        .addGap(126, 126, 126)
-                        .addComponent(jLabel14)))
-                .addContainerGap(75, Short.MAX_VALUE))
+                        .addGap(90, 90, 90)
+                        .addComponent(jLabel14))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 853, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 15, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -746,7 +784,8 @@ public class customerframe extends javax.swing.JFrame {
                     .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel14)
                     .addComponent(jLabel11)
-                    .addComponent(jLabel12))
+                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel16))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
@@ -893,14 +932,26 @@ public class customerframe extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(issuess);
 
+        jButton1.setText("I DONT KNOW");
+
+        jButton5.setText("OTHERS");
+
         javax.swing.GroupLayout issueLayout = new javax.swing.GroupLayout(issue);
         issue.setLayout(issueLayout);
         issueLayout.setHorizontalGroup(
             issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(issueLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(issueLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18))
+                    .addGroup(issueLayout.createSequentialGroup()
+                        .addGap(55, 55, 55)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(82, 82, 82)))
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(37, 37, 37))
         );
@@ -908,19 +959,120 @@ public class customerframe extends javax.swing.JFrame {
             issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(issueLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
-                .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(issueLayout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton1)
+                            .addComponent(jButton5))))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         createreqpanel.add(issue, "card3");
+
+        Photos.setBackground(new java.awt.Color(255, 255, 255));
+
+        videopanel.setBackground(new java.awt.Color(204, 255, 255));
+
+        javax.swing.GroupLayout videopanelLayout = new javax.swing.GroupLayout(videopanel);
+        videopanel.setLayout(videopanelLayout);
+        videopanelLayout.setHorizontalGroup(
+            videopanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 421, Short.MAX_VALUE)
+        );
+        videopanelLayout.setVerticalGroup(
+            videopanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        image.setText("INSERT VIDEO OR PHOTOS");
+        image.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                imageActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout PhotosLayout = new javax.swing.GroupLayout(Photos);
+        Photos.setLayout(PhotosLayout);
+        PhotosLayout.setHorizontalGroup(
+            PhotosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PhotosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(videopanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
+                .addComponent(image, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        PhotosLayout.setVerticalGroup(
+            PhotosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PhotosLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(PhotosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(image, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                    .addComponent(videopanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(50, Short.MAX_VALUE))
+        );
+
+        createreqpanel.add(Photos, "card3");
 
         schedule.setBackground(new java.awt.Color(204, 204, 204));
 
         datee.setDateFormatString("MMMMM dd, yyyy");
         datee.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         datee.setPreferredSize(new java.awt.Dimension(200, 22));
+        datee.setMinSelectableDate(new java.util.Date());
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        jLabel4.setText("TIMESLOT");
+
+        button1.setText("7 AM- 9 AM");
+
+        button2.setText("9 AM- 12 PM");
+        button2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button2ActionPerformed(evt);
+            }
+        });
+
+        button4.setText("3 PM- 5 PM");
+
+        button3.setText("1 PM- 3 PM");
+
+        javax.swing.GroupLayout timeslotLayout = new javax.swing.GroupLayout(timeslot);
+        timeslot.setLayout(timeslotLayout);
+        timeslotLayout.setHorizontalGroup(
+            timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, timeslotLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(320, 320, 320))
+            .addGroup(timeslotLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(77, 77, 77)
+                .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
+                .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(61, 61, 61)
+                .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(67, 67, 67))
+        );
+        timeslotLayout.setVerticalGroup(
+            timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(timeslotLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(23, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout scheduleLayout = new javax.swing.GroupLayout(schedule);
         schedule.setLayout(scheduleLayout);
@@ -928,15 +1080,19 @@ public class customerframe extends javax.swing.JFrame {
             scheduleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(scheduleLayout.createSequentialGroup()
                 .addGap(55, 55, 55)
-                .addComponent(datee, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(167, Short.MAX_VALUE))
+                .addGroup(scheduleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(timeslot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(datee, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
         scheduleLayout.setVerticalGroup(
             scheduleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(scheduleLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(datee, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(304, Short.MAX_VALUE))
+                .addGap(55, 55, 55)
+                .addComponent(timeslot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(56, Short.MAX_VALUE))
         );
 
         createreqpanel.add(schedule, "card3");
@@ -970,7 +1126,7 @@ public class customerframe extends javax.swing.JFrame {
                 .addGroup(SUMMARYLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(SUMMARYLayout.createSequentialGroup()
                         .addComponent(sumpic, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 36, Short.MAX_VALUE))
+                        .addGap(0, 29, Short.MAX_VALUE))
                     .addGroup(SUMMARYLayout.createSequentialGroup()
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
@@ -1990,6 +2146,15 @@ public class customerframe extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
    
+    public void buttongroup(){
+                ButtonGroup group = new ButtonGroup();
+
+         group.add(button1);
+         group.add(button2);
+         group.add(button3);
+         group.add(button4); 
+    }
+    
     private void refreshMessages() {
         java.util.Map<String, java.util.List<String[]>> fresh      = new java.util.LinkedHashMap<>();
         java.util.Map<String, String>                   freshNames = new java.util.LinkedHashMap<>();
@@ -2860,9 +3025,11 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
     // ── Progress bar update ──────────────────────────────────
     int current = jProgressBar1.getValue();
     switch (current) {
-        case 0:  current = 33;  break;
-        case 33: current = 66;  break;
-        case 66: current = 100; break;
+        case 0:  current = 25;  break;
+        case 25: current = 50;  break;
+        case 50: current = 75; break;
+        case 75: current = 100; break;
+
         default: break;
     }
     jProgressBar1.setValue(current);
@@ -2950,14 +3117,17 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
         int current = jProgressBar1.getValue();
 
         switch (current) {
-            case 33:
+            case 25:
                 current = 0;
                 break;
-            case 66:
-                current = 33;
+            case 50:
+                current = 25;
                 break;
-            case 100:
-                current = 66;
+            case 75:
+                current = 50;
+                break;
+                case 100:
+                current = 75;
                 break;
             default:
                 break;
@@ -3442,17 +3612,17 @@ handleServiceCar(3);
     }//GEN-LAST:event_paymentcar3ActionPerformed
 
     private void serviceupdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serviceupdateActionPerformed
-                USER.setSelectedIndex(3);
+                USER.setSelectedIndex(2);
 
     }//GEN-LAST:event_serviceupdateActionPerformed
 
     private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
-                USER.setSelectedIndex(3);
+                USER.setSelectedIndex(2);
 
     }//GEN-LAST:event_jButton15ActionPerformed
 
     private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
-        USER.setSelectedIndex(3);
+        USER.setSelectedIndex(2);
     }//GEN-LAST:event_jButton16ActionPerformed
 
     private void edit2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit2ActionPerformed
@@ -3574,6 +3744,86 @@ handleServiceCar(3);
         // Close this frame
         this.dispose();
     }//GEN-LAST:event_LOGOUTActionPerformed
+
+    private void imageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imageActionPerformed
+            if (evt.getSource() == image) {
+
+            JFileChooser fileChooser = new JFileChooser();
+            
+
+                    fileChooser.setCurrentDirectory(
+                    new File("C:/Users/Adrian/Videos/pictures or videos car")
+                );
+                fileChooser.setFileFilter(
+                new javax.swing.filechooser.FileNameExtensionFilter(
+                    "Images & Videos",
+                    "jpg", "jpeg", "png", "mp4"
+                )
+            );
+
+            int response = fileChooser.showOpenDialog(null);
+
+            if (response == JFileChooser.APPROVE_OPTION) {
+
+                File selectedFile = fileChooser.getSelectedFile();
+
+                String path = selectedFile.getAbsolutePath().toLowerCase();
+
+                // IMAGE
+                if (path.endsWith(".jpg") ||
+                    path.endsWith(".jpeg") ||
+                    path.endsWith(".png")) {
+
+                    ImageIcon icon = new ImageIcon(path);
+
+                    Image img = icon.getImage().getScaledInstance(
+                        452,
+                        194,
+                        Image.SCALE_SMOOTH
+                    );
+
+                    image.setText("");
+                    image.setIcon(new ImageIcon(img));
+                }
+
+                // VIDEO
+                else if (path.endsWith(".mp4")) {
+
+                    image.setIcon(null);
+
+                    Platform.runLater(() -> {
+
+                        if (mediaPlayer != null) {
+                            mediaPlayer.stop();
+                        }
+
+                        Media media = new Media(
+                            selectedFile.toURI().toString()
+                        );
+
+                        mediaPlayer = new MediaPlayer(media);
+
+                        MediaView mediaView = new MediaView(mediaPlayer);
+
+                        mediaView.setFitWidth(445);
+                        mediaView.setFitHeight(298);
+
+                        StackPane root = new StackPane(mediaView);
+
+                        Scene scene = new Scene(root, 445, 298);
+
+                        fxPanel.setScene(scene);
+
+                        mediaPlayer.play();
+                    });
+                }
+            }
+        }
+    }//GEN-LAST:event_imageActionPerformed
+
+    private void button2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_button2ActionPerformed
     public boolean isReadyForPickup(int carSlot) {
     String customer = customerframe.username;
 
@@ -4094,6 +4344,7 @@ handleServiceCar(3);
     private javax.swing.JButton LOGOUT;
     private javax.swing.JButton Messages;
     private javax.swing.JButton Payment;
+    private javax.swing.JPanel Photos;
     private javax.swing.JButton SENDBUTTONMESSAGE;
     private javax.swing.JPanel SERVPANEL1;
     private javax.swing.JPanel SERVPANEL2;
@@ -4107,6 +4358,10 @@ handleServiceCar(3);
     private javax.swing.JButton back;
     private javax.swing.JButton back2;
     private javax.swing.JLabel balance;
+    private javax.swing.JToggleButton button1;
+    private javax.swing.JToggleButton button2;
+    private javax.swing.JToggleButton button3;
+    private javax.swing.JToggleButton button4;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JLabel carmodelandplatenum;
@@ -4128,8 +4383,10 @@ handleServiceCar(3);
     private javax.swing.JButton edits3;
     private javax.swing.JPanel history;
     private javax.swing.JTable historytable;
+    private javax.swing.JButton image;
     private javax.swing.JPanel issue;
     private javax.swing.JTable issuess;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton15;
@@ -4137,6 +4394,7 @@ handleServiceCar(3);
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
@@ -4146,6 +4404,7 @@ handleServiceCar(3);
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
@@ -4162,6 +4421,7 @@ handleServiceCar(3);
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -4223,11 +4483,13 @@ handleServiceCar(3);
     private javax.swing.JTextArea summarypanel;
     private javax.swing.JLabel sumpic;
     private javax.swing.JTextField text2message;
+    private javax.swing.JPanel timeslot;
     private javax.swing.JLayeredPane toppanel;
     private javax.swing.JLabel totalpayment;
     private javax.swing.JTextArea txtareaissues;
     private javax.swing.JTextArea updatestatus;
     private javax.swing.JPanel vehicles;
+    private javax.swing.JPanel videopanel;
     // End of variables declaration//GEN-END:variables
 }
 
