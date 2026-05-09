@@ -29,12 +29,14 @@ public class updatestatus extends javax.swing.JFrame {
     static String updatestatusCSV = "src\\updatestatus.csv";
     String carrepair = "src\\CAR REPAIRS.csv";
     static int targetCarSlot = 1; // set by mechanicframe before opening
-
+    private javax.swing.JButton addissuebutton;
+    
     public updatestatus() {
         initComponents();
         
         // System name for frame
         this.setTitle("FIXO: Framework for Interactive X-auto Operations");
+        
         try {
             // for logo in frame
             ImageIcon logo = new ImageIcon(getClass().getResource("/Project_System/resources/logo.png"));
@@ -46,8 +48,11 @@ public class updatestatus extends javax.swing.JFrame {
         startRefreshingbutton(); // ADD THIS
         loadStatusFromCSV();       // ADD THIS - loads saved statuses on open
         initComboBoxListener();    // ADD THIS - listens for status changes
-            loadIssuesFromCSV();   // ← ADD THIS
-    loadPartsFromCSV();    // ← ADD THIS
+        loadIssuesFromCSV();   // ← ADD THIS
+        loadPartsFromCSV();    // ← ADD THIS
+    
+        loadIssuesCombo();
+
 
     }
 
@@ -73,6 +78,10 @@ public class updatestatus extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         ISSUES = new javax.swing.JTextArea();
         statusbox = new javax.swing.JComboBox<>();
+        ADDISSUES = new javax.swing.JButton();
+        EDITISSUES = new javax.swing.JButton();
+        issuescombo = new javax.swing.JComboBox<>();
+        ADDparts = new javax.swing.JButton();
         STATUS1 = new javax.swing.JLabel();
         STATUS2 = new javax.swing.JLabel();
 
@@ -120,10 +129,12 @@ public class updatestatus extends javax.swing.JFrame {
         jScrollPane1.setViewportView(updatestatus);
 
         PARTSREQUESTED.setColumns(20);
+        PARTSREQUESTED.setFont(new java.awt.Font("Courier New", 0, 14)); // NOI18N
         PARTSREQUESTED.setRows(5);
         jScrollPane2.setViewportView(PARTSREQUESTED);
 
         ISSUES.setColumns(20);
+        ISSUES.setFont(new java.awt.Font("Courier New", 0, 14)); // NOI18N
         ISSUES.setRows(5);
         jScrollPane3.setViewportView(ISSUES);
 
@@ -131,6 +142,29 @@ public class updatestatus extends javax.swing.JFrame {
         statusbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 statusboxActionPerformed(evt);
+            }
+        });
+
+        ADDISSUES.setText("ADD ISSUES");
+        ADDISSUES.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ADDISSUESActionPerformed(evt);
+            }
+        });
+
+        EDITISSUES.setText("DELETE ISSUES");
+        EDITISSUES.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EDITISSUESActionPerformed(evt);
+            }
+        });
+
+        issuescombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        ADDparts.setText("ADD PARTS");
+        ADDparts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ADDpartsActionPerformed(evt);
             }
         });
 
@@ -147,7 +181,15 @@ public class updatestatus extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
                     .addComponent(jScrollPane3))
-                .addGap(289, 289, 289))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(ADDISSUES)
+                        .addGap(31, 31, 31)
+                        .addComponent(issuescombo, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(EDITISSUES)
+                    .addComponent(ADDparts))
+                .addGap(26, 26, 26))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -155,9 +197,20 @@ public class updatestatus extends javax.swing.JFrame {
                 .addGap(0, 39, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(ADDISSUES)
+                                    .addComponent(issuescombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addComponent(EDITISSUES)))
                         .addGap(8, 8, 8)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(ADDparts)
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(13, 13, 13)
                 .addComponent(statusbox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -223,8 +276,257 @@ public class updatestatus extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void ADDISSUESActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ADDISSUESActionPerformed
+        String selectedIssue = (String) issuescombo.getSelectedItem();
+        if (selectedIssue == null || selectedIssue.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please select an issue first.");
+            return;
+        }
+
+        String customer = customerframe.username.trim();
+        String mechanic = mechanicframe.mechanicname.trim();
+        String date     = new java.text.SimpleDateFormat("MMM/dd/yyyy").format(new java.util.Date());
+
+        // Read problems.csv to figure out:
+        // 1. The car plate for this customer
+        // 2. The idreq for this customer+mechanic pair
+        // 3. The current max repairmanissuenumber for this mechanic
+        // 4. The current max issuenumber for this customer+mechanic pair
+        String carPlate        = "";
+        int    idreq           = -1;
+        int    maxRepairmanIssueNum = 0;
+        int    maxIssueNum     = 0;
+
+        java.io.File probFile = new java.io.File("src\\problems.csv");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(probFile))) {
+            String line;
+            boolean firstRow = true;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (firstRow) { firstRow = false; continue; } // skip header
+
+                // cols: repairmanissuenumber(0), issuenumber(1), username(2),
+                //       car(3), problems(4), date(5), idreq(6), repairman(7)
+                String[] cols = line.split(",", -1);
+                if (cols.length < 8) continue;
+
+                String rowCustomer = cols[2].trim();
+                String rowMechanic = cols[7].trim();
+
+                // Track max repairmanissuenumber globally for this mechanic
+                if (rowMechanic.equalsIgnoreCase(mechanic)) {
+                    try {
+                        int rNum = Integer.parseInt(cols[0].trim());
+                        if (rNum > maxRepairmanIssueNum) maxRepairmanIssueNum = rNum;
+                    } catch (NumberFormatException ignored) {}
+                }
+
+                // For matching customer + mechanic: get car, idreq, max issuenumber
+                if (rowCustomer.equalsIgnoreCase(customer) && rowMechanic.equalsIgnoreCase(mechanic)) {
+                    carPlate = cols[3].trim();
+                    try { idreq = Integer.parseInt(cols[6].trim()); } catch (NumberFormatException ignored) {}
+                    try {
+                        int iNum = Integer.parseInt(cols[1].trim());
+                        if (iNum > maxIssueNum) maxIssueNum = iNum;
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error reading problems.csv: " + ex.getMessage());
+            return;
+        }
+
+        // Validation: must have found a matching customer+mechanic pair already in problems.csv
+        if (carPlate.isEmpty() || idreq == -1) {
+            JOptionPane.showMessageDialog(this,
+                "No existing repair record found for this customer and mechanic.\nCannot add issue.",
+                "Not Found", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Check if this exact issue already exists for this customer+mechanic
+        try (BufferedReader br = new BufferedReader(new FileReader(probFile))) {
+            String line;
+            boolean firstRow = true;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (firstRow) { firstRow = false; continue; }
+                String[] cols = line.split(",", -1);
+                if (cols.length < 8) continue;
+                if (cols[2].trim().equalsIgnoreCase(customer)
+                 && cols[7].trim().equalsIgnoreCase(mechanic)
+                 && cols[4].trim().equalsIgnoreCase(selectedIssue)) {
+                    JOptionPane.showMessageDialog(this,
+                        "\"" + selectedIssue + "\" is already listed for this repair.",
+                        "Duplicate", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return;
+        }
+
+        // New row values
+        int newRepairmanIssueNum = maxRepairmanIssueNum; // same group = same repairmanissuenumber
+        int newIssueNum          = maxIssueNum + 1;
+
+        // repairmanissuenumber, issuenumber, username, car, problems, date, idreq, repairman
+        String newRow = newRepairmanIssueNum + ","
+                      + newIssueNum + ","
+                      + customer + ","
+                      + carPlate + ","
+                      + selectedIssue + ","
+                      + date + ","
+                      + idreq + ","
+                      + mechanic;
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(probFile, true))) {
+            bw.write(newRow);
+            bw.newLine();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error writing to problems.csv: " + ex.getMessage());
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this,
+            "Issue \"" + selectedIssue + "\" added successfully!",
+            "Added", JOptionPane.INFORMATION_MESSAGE);
+
+        loadIssuesFromCSV(); // refresh the ISSUES text area
     
-    
+    }//GEN-LAST:event_ADDISSUESActionPerformed
+
+    private void EDITISSUESActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EDITISSUESActionPerformed
+    String customer = customerframe.username.trim();
+    String mechanic = mechanicframe.mechanicname.trim();
+
+    // Build list of issues from ISSUES textarea
+    String textContent = ISSUES.getText().trim();
+    if (textContent.isEmpty() || textContent.equals("No issues found.")) {
+        JOptionPane.showMessageDialog(this, "No issues to delete.", "Edit Issues", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    // Parse the bullet lines into a clean list
+    String[] lines = textContent.split("\n");
+    java.util.List<String> issueList = new java.util.ArrayList<>();
+    for (String line : lines) {
+        String cleaned = line.trim().replaceFirst("^•\\s*", "");
+        if (!cleaned.isEmpty()) {
+            issueList.add(cleaned);
+        }
+    }
+
+    if (issueList.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "No issues to delete.", "Edit Issues", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    // Show JOptionPane with the list as choices
+    String[] issueArray = issueList.toArray(new String[0]);
+    String selected = (String) JOptionPane.showInputDialog(
+        this,
+        "Select an issue to delete:",
+        "Edit Issues",
+        JOptionPane.QUESTION_MESSAGE,
+        null,
+        issueArray,
+        issueArray[0]
+    );
+
+    if (selected == null) return; // user cancelled
+
+    // Confirm before deleting
+    int confirm = JOptionPane.showConfirmDialog(
+        this,
+        "Delete issue: \"" + selected + "\"?",
+        "Confirm Delete",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE
+    );
+    if (confirm != JOptionPane.YES_OPTION) return;
+
+    // Rewrite problems.csv skipping the matching row
+    java.io.File probFile = new java.io.File("src\\problems.csv");
+    java.util.List<String> allLines = new java.util.ArrayList<>();
+    boolean deleted = false;
+
+    try (BufferedReader br = new BufferedReader(new FileReader(probFile))) {
+        String line;
+        boolean firstRow = true;
+        while ((line = br.readLine()) != null) {
+            if (firstRow) {
+                allLines.add(line); // always keep header
+                firstRow = false;
+                continue;
+            }
+            String[] cols = line.split(",", -1);
+            if (!deleted
+                && cols.length >= 8
+                && cols[2].trim().equalsIgnoreCase(customer)
+                && cols[7].trim().equalsIgnoreCase(mechanic)
+                && cols[4].trim().equalsIgnoreCase(selected)) {
+                deleted = true; // skip this one row only
+                continue;
+            }
+            allLines.add(line);
+        }
+    } catch (IOException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error reading problems.csv: " + ex.getMessage());
+        return;
+    }
+
+    // Write back
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(probFile, false))) {
+        for (String row : allLines) {
+            bw.write(row);
+            bw.newLine();
+        }
+    } catch (IOException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error writing problems.csv: " + ex.getMessage());
+        return;
+    }
+
+    JOptionPane.showMessageDialog(this, "Issue \"" + selected + "\" deleted successfully.", "Deleted", JOptionPane.INFORMATION_MESSAGE);
+    loadIssuesFromCSV(); // refresh the textarea
+
+    }//GEN-LAST:event_EDITISSUESActionPerformed
+
+    private void ADDpartsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ADDpartsActionPerformed
+            cartshop cartForm = new cartshop();
+            cartForm.customerUsername = customerframe.username.trim();
+            cartForm.mechanicName = mechanicframe.mechanicname.trim();
+            new SHOPEE(cartForm).setVisible(true);
+    }//GEN-LAST:event_ADDpartsActionPerformed
+
+    public void loadIssuesCombo() {
+        issuescombo.removeAllItems();
+        try (BufferedReader br = new BufferedReader(new FileReader("src\\issues.csv"))) {
+            String line;
+            boolean firstRow = true;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (firstRow) { firstRow = false; continue; } // skip header
+                // cols: Id(0), Category(1), IssueName(2)
+                String[] cols = line.split(",", -1);
+                if (cols.length >= 3) {
+                    issuescombo.addItem(cols[2].trim()); // show IssueName
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+        
     public void startRefreshingbutton() {
     String name = username;
     System.out.println(username);
@@ -323,7 +625,7 @@ public void loadIssuesFromCSV() {
             if (!rowMechanic.equalsIgnoreCase(mechanic)) continue;
 
             if (sb.length() > 0) sb.append("\n");
-            sb.append("• ").append(problem).append("  [").append(date).append("]");
+            sb.append("• ").append(problem);
         }
     } catch (IOException ex) {
         ex.printStackTrace();
@@ -610,11 +912,15 @@ bw.newLine();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ADDISSUES;
+    private javax.swing.JButton ADDparts;
+    private javax.swing.JButton EDITISSUES;
     private javax.swing.JTextArea ISSUES;
     private javax.swing.JTextArea PARTSREQUESTED;
     private javax.swing.JPanel SERVPANEL2;
     private javax.swing.JLabel STATUS1;
     private javax.swing.JLabel STATUS2;
+    private javax.swing.JComboBox<String> issuescombo;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

@@ -41,10 +41,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 public class mechanicframe extends javax.swing.JFrame {
-    static String username;
+    static String username = "Sherwin";
     
     private Timer refreshTimer;
-    static String mechanicname ; // Change this to actual mechanic name
+    static String mechanicname; // Change this to actual mechanic name
     static String problemfile = "src\\problems.csv";
     static String partsreq = "src\\workorder.csv";
     static String inventory = "src\\inventory.csv";
@@ -72,7 +72,8 @@ public class mechanicframe extends javax.swing.JFrame {
      */
     public mechanicframe(String username) {
         initComponents();
-        
+                this.mechanicname = username;
+
         // System name for frame
         this.setTitle("FIXO: Framework for Interactive X-auto Operations");
         try {
@@ -89,8 +90,6 @@ public class mechanicframe extends javax.swing.JFrame {
         startRefreshing();
         loadDashboard();
 
-        workreq();
-        this.mechanicname = username;
         SwingUtilities.invokeLater(() -> {
         getdata();
         loadparts();
@@ -892,104 +891,71 @@ public class mechanicframe extends javax.swing.JFrame {
 
     public void loadDashboard() {
 
-    // ── NOTIFICATIONS — new status updates for this mechanic's customers ──
-    StringBuilder notifSb = new StringBuilder();
+        // ── NOTIFICATIONS ──
+        StringBuilder notifSb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader("src\\updatestatus.csv"))) {
+            String line; boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] cols = line.split(",", -1);
+                if (cols.length < 6) continue;
+                if (!cols[2].trim().equalsIgnoreCase(mechanicname)) continue;
 
-    try (BufferedReader br = new BufferedReader(new FileReader("src\\updatestatus.csv"))) {
-        String line; boolean first = true;
-        while ((line = br.readLine()) != null) {
-            if (first) { first = false; continue; }
-            // cols: id(0),customer(1),repairman(2),diagnoses(3),customersame(4),idcustomer(5)
-            String[] cols = line.split(",", -1);
-            if (cols.length < 6) continue;
-            if (!cols[2].trim().equalsIgnoreCase(mechanicname)) continue;
+                String customer  = cols[1].trim();
+                String status    = cols[3].trim();
+                String timestamp = cols[4].trim();
+                String slot      = cols[5].trim();
 
-            String customer  = cols[1].trim();
-            String status    = cols[3].trim();
-            String timestamp = cols[4].trim();
-            String slot      = cols[5].trim();
-
-            notifSb.append("[").append(timestamp).append("]\n")
-                   .append("Customer: ").append(customer)
-                   .append(" | Car Slot: ").append(slot)
-                   .append("\nStatus: ").append(status)
-                   .append("\n\n");
-        }
-    } catch (Exception e) { e.printStackTrace(); }
-
-    notifications.setText(notifSb.length() > 0
-        ? notifSb.toString().trim()
-        : "No notifications yet.");
-    notifications.setCaretPosition(0);
-
-
-    // ── WORKQUEUE — all jobs from problems.csv for this mechanic ──
-    DefaultTableModel serviceModel = (DefaultTableModel) servicetable.getModel();
-    serviceModel.setRowCount(0);
-
-    // First load latest status per customer+idcustomer from updatestatus.csv
-    java.util.Map<String, String> statusMap = new java.util.LinkedHashMap<>();
-    try (BufferedReader br = new BufferedReader(new FileReader("src\\updatestatus.csv"))) {
-        String line; boolean first = true;
-        while ((line = br.readLine()) != null) {
-            if (first) { first = false; continue; }
-            String[] cols = line.split(",", -1);
-            if (cols.length < 6) continue;
-            String key = cols[1].trim().toLowerCase() + "|" + cols[5].trim();
-            statusMap.put(key, cols[3].trim()); // overwrite = latest status
-        }
-    } catch (Exception ignored) {}
-
-    // Then load problems.csv for this mechanic — group unique jobs by idreq
-    // cols: repairmanissuenumber(0),issuenumber(1),username(2),car(3),
-    //       problems(4),date(5),idreq(6),repairman(7)
-    java.util.Map<String, String[]> jobMap = new java.util.LinkedHashMap<>();
-
-    try (BufferedReader br = new BufferedReader(new FileReader("src\\problems.csv"))) {
-        String line; boolean first = true;
-        while ((line = br.readLine()) != null) {
-            if (first) { first = false; continue; }
-            String[] cols = line.split(",", -1);
-            if (cols.length < 8) continue;
-            if (!cols[7].trim().equalsIgnoreCase(mechanicname)) continue;
-
-            String slot     = cols[0].trim(); // repairmanissuenumber = car slot
-            String username = cols[2].trim();
-            String car      = cols[3].trim();
-            String date     = cols[5].trim();
-            String idreq    = cols[6].trim();
-
-            // Aggregate issues for same idreq
-            String key = idreq;
-            if (jobMap.containsKey(key)) {
-                // append issue to existing row
-                String[] existing = jobMap.get(key);
-                existing[3] = existing[3] + ", " + cols[4].trim(); // append issue
-            } else {
-                String statusKey    = username.toLowerCase() + "|" + slot;
-                String currentStatus = statusMap.getOrDefault(statusKey, "PENDING");
-                jobMap.put(key, new String[]{
-                    idreq,           // ID NO#
-                    username,        // CUSTOMER
-                    car,             // VEHICLE
-                    cols[4].trim(),  // ISSUE
-                    date,            // DATE
-                    currentStatus,    // STATUS
-                        slot
-                });
+                notifSb.append("[").append(timestamp).append("]\n")
+                       .append("Customer: ").append(customer)
+                       .append(" | Car Slot: ").append(slot)
+                       .append("\nStatus: ").append(status)
+                       .append("\n\n");
             }
-        }
-    } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { e.printStackTrace(); }
 
-    int rowIdx = serviceModel.getRowCount(); // BEFORE addRow
-    for (String[] row : jobMap.values()) {
-        rowSlotMap.put(rowIdx, row[6]); // store slot for this row
-        serviceModel.addRow(new Object[]{
-            row[0], row[1], row[2], row[3], row[4], "", row[5]
-        });
-        rowIdx++;
+        notifications.setText(notifSb.length() > 0
+            ? notifSb.toString().trim()
+            : "No notifications yet.");
+        notifications.setCaretPosition(0);
+
+        // ── WORKLIST textarea ──
+        // Shows a summary list of all jobs assigned to this mechanic
+        StringBuilder workSb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader("src\\problems.csv"))) {
+            String line; boolean first = true;
+            java.util.Set<String> seen = new java.util.LinkedHashSet<>();
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                String[] cols = line.split(",", -1);
+                if (cols.length < 8) continue;
+                if (!cols[7].trim().equalsIgnoreCase(mechanicname)) continue;
+
+                String idreq    = cols[6].trim();
+                String customer = cols[2].trim();
+                String car      = cols[3].trim();
+                String date     = cols[5].trim();
+
+                // One line per unique job (idreq)
+                String jobKey = idreq;
+                if (!seen.contains(jobKey)) {
+                    seen.add(jobKey);
+                    workSb.append("• Job #").append(idreq)
+                          .append(" | ").append(customer)
+                          .append(" | Car: ").append(car)
+                          .append(" | ").append(date)
+                          .append("\n");
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        worklist.setText(workSb.length() > 0
+            ? workSb.toString().trim()
+            : "No jobs assigned.");
+        worklist.setCaretPosition(0);
     }
-}
     
     private void refreshMessages() {
         Map<String, List<String[]>> fresh     = new LinkedHashMap<>();
@@ -1169,139 +1135,73 @@ public class mechanicframe extends javax.swing.JFrame {
             
             
     public void getdata() {
-        BufferedReader reader1 = null;
-        String line;
-        boolean firstRow = true;
+        DefaultTableModel requesttables = (DefaultTableModel) requesttable.getModel();
+        DefaultTableModel servicetables = (DefaultTableModel) servicetable.getModel();
 
-        try {
-            reader1 = new BufferedReader(new FileReader(assigntable));
-
-            DefaultTableModel requesttables = (DefaultTableModel) requesttable.getModel();
-            DefaultTableModel servicetables = (DefaultTableModel) servicetable.getModel();
-
-             // ✅ FIX: Clear both tables before repopulating
         requesttables.setRowCount(0);
+        servicetables.setRowCount(0);
         rowProblemsMap.clear();
 
-            String currentIdReq = "";
-            String vehicle = "";
-            String model_name = "";
-            String date = "";
-            String combinedProblems = "";
+        // Load latest status per customer+slot from updatestatus.csv
+        java.util.Map<String, String> statusMap = new java.util.LinkedHashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("src\\updatestatus.csv"))) {
+            String line; boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] c = line.split(",", -1);
+                if (c.length < 6) continue;
+                String key = c[1].trim().toLowerCase() + "|" + c[5].trim();
+                statusMap.put(key, c[3].trim());
+            }
+        } catch (Exception ignored) {}
 
-            while ((line = reader1.readLine()) != null) {
-                String[] row = line.split(",");
-                if (firstRow) {
-                    firstRow = false;
-                    continue;
-                }
-                if (row.length < 6 || line.trim().isEmpty()) {
-                    continue;
-                }
+        // Read problems.csv — group by idreq, filter by mechanicname
+        // cols: repairmanissuenumber(0), issuenumber(1), username(2), car(3),
+        //       problems(4), date(5), idreq(6), repairman(7)
+        java.util.Map<String, String[]> jobMap = new java.util.LinkedHashMap<>();
 
-                if (row.length >= 8) {
-                    String idReq = row[6].trim();
-                    String username = row[2].trim();
-                    String car = row[3].trim();
-                    String problem = row[4].trim();
-                    String dateValue = row[5].trim();
-                    String mechanicName = row[7].trim();
+        try (BufferedReader br = new BufferedReader(new FileReader(problemfile))) {
+            String line; boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                String[] cols = line.split(",", -1);
+                if (cols.length < 8) continue;
+                if (!cols[7].trim().equalsIgnoreCase(mechanicname)) continue;
 
-                    if (!mechanicName.equalsIgnoreCase(mechanicname)) {
-                        continue;
-                    }
+                String idreq    = cols[6].trim();
+                String slot     = cols[0].trim();
+                String customer = cols[2].trim();
+                String car      = cols[3].trim();
+                String problem  = cols[4].trim();
+                String date     = cols[5].trim();
 
-                    if (currentIdReq.equals(idReq)) {
-                        combinedProblems += ", " + problem;
-                    } else {
-                        if (!currentIdReq.isEmpty()) {
-                            
-                                int rowIndex = requesttables.getRowCount(); // get BEFORE adding
-
-    // ← ADD THIS
-    rowProblemsMap.put(rowIndex, combinedProblems.split(", "));
-    
-                            requesttables.addRow(new Object[]{currentIdReq, vehicle, model_name, combinedProblems, date, "", ""});
-                            servicetables.addRow(new Object[]{currentIdReq, vehicle, model_name, combinedProblems, date, "", "UPDATE STATUS"});
-                        }
-                        currentIdReq = idReq;
-                        vehicle = username;
-                        model_name = car;
-                        combinedProblems = problem;
-                        date = dateValue;
-                    }
+                if (jobMap.containsKey(idreq)) {
+                    jobMap.get(idreq)[3] += ", " + problem;
+                } else {
+                    String statusKey    = customer.toLowerCase() + "|" + slot;
+                    String currentStatus = statusMap.getOrDefault(statusKey, "PENDING");
+                    jobMap.put(idreq, new String[]{
+                        idreq, customer, car, problem, date, currentStatus, slot
+                    });
                 }
             }
+        } catch (Exception e) { e.printStackTrace(); }
 
-            // Last row
-            if (!currentIdReq.isEmpty()) {
-                
-                    int rowIndex = requesttables.getRowCount(); // BEFORE addRow
-
-    // ← ADD THIS
-    rowProblemsMap.put(rowIndex, combinedProblems.split(", "));
-
-                requesttables.addRow(new Object[]{currentIdReq, vehicle, model_name, combinedProblems, date, "", ""});
-                servicetables.addRow(new Object[]{currentIdReq, vehicle, model_name, combinedProblems, date, "", "UPDATE STATUS"});
-            }
-
-            table(); // ← no argument needed anymore
-
-            reader1.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(adminframe.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(adminframe.class.getName()).log(Level.SEVERE, null, ex);
+        int rowIdx = 0;
+        for (String[] row : jobMap.values()) {
+            rowProblemsMap.put(rowIdx, row[3].split(", "));
+            rowSlotMap.put(rowIdx, row[6]);
+            requesttables.addRow(new Object[]{row[0], row[1], row[2], row[3], row[4], "", ""});
+            servicetables.addRow(new Object[]{row[0], row[1], row[2], row[3], row[4], "", "UPDATE STATUS"});
+            rowIdx++;
         }
+
+        table();
     }
 
-    public void workreq() {
-
-        DefaultTableModel model2 = (DefaultTableModel) requesttable.getModel();
-
-        try (
-                BufferedReader br1 = new BufferedReader(new FileReader(partsreq));
-                BufferedReader br2 = new BufferedReader(new FileReader(problemfile))) {
-
-            br1.readLine(); // skip header
-            br2.readLine(); // skip header
-
-            String line1;
-            String line2;
-
-            // 🔥 store rows to delete
-            List<Integer> rowsToDelete = new ArrayList<>();
-
-            int rowIndex = 0;
-
-            while ((line1 = br1.readLine()) != null
-                    && (line2 = br2.readLine()) != null) {
-
-                String[] cols1 = line1.split(",");
-
-                if (cols1.length >= 3) {
-
-                    String status = cols1[2].trim();
-
-                    System.out.println("Row " + rowIndex + " status: " + status);
-
-                    if (status.equalsIgnoreCase("YES")) {
-                        rowsToDelete.add(rowIndex);
-                    }
-                }
-
-                rowIndex++;
-            }
-
-            // 🔥 DELETE IN REVERSE ORDER (IMPORTANT)
-            Collections.sort(rowsToDelete, Collections.reverseOrder());
-
-           
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+   
 
     public void table() {
    
@@ -1531,11 +1431,10 @@ public class mechanicframe extends javax.swing.JFrame {
 
     java.util.List<Object[]> rows = new java.util.ArrayList<>();
 
-    // ── 1. Read updatestatus.csv — only READY FOR PICKUP rows for this mechanic ──
-    // id(0), customer(1), repairman(2), diagnoses(3), timestamp(4), idcustomer(5)
-    // key = customer|idcustomer, value = [timestamp, diagnoses]
+    // ── 1. Read updatestatus.csv — READY FOR PICKUP rows for this mechanic ──
+    // cols: id(0), customer(1), repairman(2), status(3), timestamp(4), idcustomer(5)
+    // key = customer|idcustomer (slot), value = [timestamp, customer, idcustomer]
     java.util.Map<String, String[]> readyMap = new java.util.LinkedHashMap<>();
-
     try (BufferedReader br = new BufferedReader(new FileReader("src\\updatestatus.csv"))) {
         String line; boolean first = true;
         while ((line = br.readLine()) != null) {
@@ -1545,13 +1444,10 @@ public class mechanicframe extends javax.swing.JFrame {
             if (c.length < 6) continue;
             if (!c[2].trim().equalsIgnoreCase(mechanic)) continue;
             if (!c[3].trim().equalsIgnoreCase("READY FOR PICKUP")) continue;
-
-            String customer    = c[1].trim();
-            String idcustomer  = c[5].trim(); // slot 1,2,3
-            String timestamp   = c[4].trim();
-            String key         = customer + "|" + idcustomer;
-
-            // last row wins = latest READY FOR PICKUP per customer+slot
+            String customer   = c[1].trim();
+            String idcustomer = c[5].trim();
+            String timestamp  = c[4].trim();
+            String key        = customer.toLowerCase() + "|" + idcustomer;
             readyMap.put(key, new String[]{timestamp, customer, idcustomer});
         }
     } catch (Exception e) { e.printStackTrace(); }
@@ -1562,81 +1458,115 @@ public class mechanicframe extends javax.swing.JFrame {
         return;
     }
 
-    // ── 2. Read CAR REPAIRS.csv ──
-    // customerid(0), ownername(1), plateNum(2), model(3), brand(4),
-    // year(5), color(6), mileage(7), link(8)
-    // key = customer|customerid, value = [plateNum, model]
-    java.util.Map<String, String[]> carMap = new java.util.HashMap<>();
+    // ── 2. Read problems.csv — get car plate per idreq ──
+    // cols: repairmanissuenumber(0), issuenumber(1), username(2), car(3),
+    //       problems(4), date(5), idreq(6), repairman(7)
+    // key = customer|idreq, value = car plate
+    java.util.Map<String, String> carPlateMap = new java.util.HashMap<>();
+    try (BufferedReader br = new BufferedReader(new FileReader("src\\problems.csv"))) {
+        String line; boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            if (line.trim().isEmpty()) continue;
+            String[] c = line.split(",", -1);
+            if (c.length < 8) continue;
+            String key = c[2].trim().toLowerCase() + "|" + c[6].trim(); // customer|idreq
+            carPlateMap.putIfAbsent(key, c[3].trim()); // car plate
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+
+    // ── 3. Read CAR REPAIRS.csv — get model by plate ──
+    // cols: customerid(0), ownername(1), plateNum(2), model(3)
+    // key = plateNum, value = model
+    java.util.Map<String, String> modelMap = new java.util.HashMap<>();
     try (BufferedReader br = new BufferedReader(new FileReader("src\\CAR REPAIRS.csv"))) {
         String line; boolean first = true;
         while ((line = br.readLine()) != null) {
             if (first) { first = false; continue; }
             String[] c = line.split(",", -1);
             if (c.length < 4) continue;
-            String key = c[1].trim() + "|" + c[0].trim(); // ownername|customerid
-            carMap.put(key, new String[]{c[2].trim(), c[3].trim()});
+            modelMap.putIfAbsent(c[2].trim(), c[3].trim()); // plateNum -> model
         }
     } catch (Exception e) { e.printStackTrace(); }
 
-    // ── 3. Read reciept.csv — check paid ──
-    // id(0), samecustomerid(1), customer(2), DATE(3), payment(4), totalcost(5)
-    // key = customer|samecustomerid, value = [totalcost, paymentmethod]
+    // ── 4. Read reciept.csv — parse safely ignoring the multiline receipt field ──
+    // cols: id(0), samecustomerid(1), customer(2), DATE(3), payment(4), totalcost(5), receipt(6...)
+    // key = customer|samecustomerid, value = [totalcost, payment]
     java.util.Map<String, String[]> paidMap = new java.util.HashMap<>();
     try (BufferedReader br = new BufferedReader(new FileReader("src\\reciept.csv"))) {
         String line; boolean first = true;
+        boolean insideQuote = false;
+        String currentLine = "";
         while ((line = br.readLine()) != null) {
-            if (first) { first = false; continue; }
-            if (line.trim().isEmpty()) continue;
-            String[] c = line.split(",", 7);
-            if (c.length < 6) continue;
-            String key = c[2].trim() + "|" + c[1].trim(); // customer|samecustomerid
-            paidMap.put(key, new String[]{c[5].trim(), c[4].trim()});
-        }
-    } catch (Exception ignored) {}
+            if (first && (line.startsWith("\uFEFF") || line.startsWith("id,"))) {
+                first = false;
+                continue;
+            }
+            first = false;
 
-    // ── 4. Build one row per READY FOR PICKUP entry ──
+            // Handle multiline quoted fields — accumulate until quotes balance
+            currentLine += (currentLine.isEmpty() ? "" : "\n") + line;
+            long quoteCount = currentLine.chars().filter(ch -> ch == '"').count();
+            if (quoteCount % 2 != 0) continue; // odd quotes = still inside quoted field
+
+            // Now currentLine is a complete record
+            String record = currentLine;
+            currentLine = "";
+
+            // Split only first 6 commas to avoid splitting inside receipt text
+            String[] c = record.split(",", 7);
+            if (c.length < 6) continue;
+
+            String idField       = c[0].trim().replace("\uFEFF", ""); // strip BOM if on first field
+            String sameCustId    = c[1].trim();
+            String customer      = c[2].trim();
+            String totalcost     = c[5].trim();
+            String payment       = c[4].trim();
+
+            String key = customer.toLowerCase() + "|" + sameCustId;
+            paidMap.put(key, new String[]{totalcost, payment});
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+
+    // ── 5. Build rows ──
     for (java.util.Map.Entry<String, String[]> entry : readyMap.entrySet()) {
-        String key        = entry.getKey();          // customer|idcustomer
+        String key        = entry.getKey();       // customer|idcustomer
         String[] info     = entry.getValue();
         String timestamp  = info[0];
         String customer   = info[1];
-        String idcustomer = info[2];
+        String idcustomer = info[2];             // = idreq / samecustomerid
 
-        String[] car     = carMap.getOrDefault(key, new String[]{"N/A", "N/A"});
-        String plateNum  = car[0];
-        String model     = car[1];
+        // Get plate from problems.csv using customer+idreq
+        String plateKey  = customer.toLowerCase() + "|" + idcustomer;
+        String plateNum  = carPlateMap.getOrDefault(plateKey, "N/A");
 
+        // Get model from CAR REPAIRS.csv using plate
+        String model     = modelMap.getOrDefault(plateNum, "N/A");
+
+        // Get payment info from reciept.csv
         boolean paid      = paidMap.containsKey(key);
         String totalSpent = paid ? "₱" + paidMap.get(key)[0] : "₱0";
         String paidStatus = paid ? "PAID" : "NOT PAID";
 
         rows.add(new Object[]{
-            timestamp,   // DATE
-            plateNum,    // PLATENUMBER
-            customer,    // CUSTOMER
-            model,       // MODEL
-            totalSpent,  // TOTAL SPENT
-            paidStatus,  // PAID/NOT PAID
-            "COMPLETED"  // COMPLETED — only READY FOR PICKUP rows reach here
+            timestamp, plateNum, customer, model, totalSpent, paidStatus, "COMPLETED"
         });
     }
 
-    // ── 5. Set table ──
+    // ── 6. Set table model ──
     Object[][] data = rows.toArray(new Object[0][]);
     DefaultTableModel model = new DefaultTableModel(data, columns) {
         @Override public boolean isCellEditable(int r, int c) { return false; }
     };
     historytable.setModel(model);
 
-    // Color PAID green, NOT PAID red
     historytable.setDefaultRenderer(Object.class,
         new javax.swing.table.DefaultTableCellRenderer() {
             @Override
             public java.awt.Component getTableCellRendererComponent(
                     javax.swing.JTable table, Object value, boolean isSelected,
                     boolean hasFocus, int row, int col) {
-                super.getTableCellRendererComponent(
-                    table, value, isSelected, hasFocus, row, col);
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
                 String paidVal = String.valueOf(table.getValueAt(row, 5));
                 if (!isSelected) {
                     setBackground(paidVal.equals("PAID")
@@ -1647,7 +1577,6 @@ public class mechanicframe extends javax.swing.JFrame {
             }
         });
 
-    // ── 6. Set COMPLETEDJOBS count ──
     COMPLETEDJOBS.setText(String.valueOf(rows.size()));
 }
     

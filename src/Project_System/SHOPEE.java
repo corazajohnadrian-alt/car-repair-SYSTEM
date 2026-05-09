@@ -140,6 +140,8 @@ public class SHOPEE extends javax.swing.JFrame {
         jButton7 = new Project_System.Design.ModernButton()
         ;
         jPanel1 = new javax.swing.JPanel();
+        jButton8 = new Project_System.Design.ModernButton()
+        ;
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 0));
@@ -393,7 +395,7 @@ public class SHOPEE extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(Transimissionprice, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(transmissioncombobox, javax.swing.GroupLayout.Alignment.LEADING, 0, 136, Short.MAX_VALUE)
+                                    .addComponent(transmissioncombobox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(jTextField10, javax.swing.GroupLayout.Alignment.LEADING)))
                             .addComponent(Transmission, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -717,6 +719,16 @@ public class SHOPEE extends javax.swing.JFrame {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
+        jButton8.setBackground(new java.awt.Color(0, 153, 153));
+        jButton8.setFont(new java.awt.Font("Bahnschrift", 0, 12)); // NOI18N
+        jButton8.setForeground(new java.awt.Color(255, 255, 255));
+        jButton8.setText("ISSUES");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -728,7 +740,9 @@ public class SHOPEE extends javax.swing.JFrame {
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(96, 96, 96)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
                 .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
             .addComponent(jScrollPane1)
@@ -742,7 +756,9 @@ public class SHOPEE extends javax.swing.JFrame {
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -927,6 +943,18 @@ public class SHOPEE extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_EngineActionPerformed
 
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        ISSUES issue = new ISSUES();
+        issue.setVisible(true);
+        issue.pack();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        int x = 20; // left side margin
+        int y = 100; // distance from top
+
+        issue.setLocation(x, y);
+    }//GEN-LAST:event_jButton8ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -996,6 +1024,7 @@ public class SHOPEE extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> coolantcombobox;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

@@ -1471,7 +1471,7 @@ private MediaPlayer mediaPlayer;
             }
         });
 
-        jScrollPane5.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane5.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         jScrollPane5.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
         updatestatus.setColumns(20);
@@ -1495,11 +1495,12 @@ private MediaPlayer mediaPlayer;
             .addGroup(servpanel2Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(servpanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(servpanel2Layout.createSequentialGroup()
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(servpanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(servpanel2Layout.createSequentialGroup()
                         .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
@@ -1517,12 +1518,10 @@ private MediaPlayer mediaPlayer;
                     .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(servpanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, servpanel2Layout.createSequentialGroup()
-                        .addGap(273, 273, 273)
-                        .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(servpanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(14, 14, 14))
         );
 
@@ -2860,10 +2859,27 @@ private MediaPlayer mediaPlayer;
                 }
             } catch (Exception e) { e.printStackTrace(); }
 
+            // Look up mechanic for this specific slot via idreq
+            String slotMechanic = "Not yet assigned";
+            try (BufferedReader brm = new BufferedReader(new FileReader("src\\problems.csv"))) {
+                String mline; boolean mfirst = true;
+                while ((mline = brm.readLine()) != null) {
+                    if (mfirst) { mfirst = false; continue; }
+                    String[] mc = mline.split(",", -1);
+                    if (mc.length >= 8 &&
+                        mc[2].trim().equalsIgnoreCase(customer) &&
+                        Integer.parseInt(mc[6].trim()) == slot &&
+                        !mc[7].trim().isEmpty()) {
+                        slotMechanic = mc[7].trim();
+                        break;
+                    }
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+
             notif.append("Car ").append(slot).append(" — ").append(model)
             .append(" | ").append(plateNum)
             .append("\n  Customer : ").append(customer)
-            .append("\n  Mechanic : ").append(assignedMechanic.isEmpty() ? "Not yet assigned" : assignedMechanic)
+            .append("\n  Mechanic : ").append(slotMechanic)
             .append("\n  Status   : ").append(status)
             .append("\n  Updated  : ").append(latestTime)
             .append("\n\n");
@@ -2882,76 +2898,74 @@ private MediaPlayer mediaPlayer;
             return;
         }
 
+        // ── Step 1: get the mechanic for the current service slot from problems.csv ──
+        String targetMechanic = "";
+        try (java.io.BufferedReader br = new java.io.BufferedReader(
+                new java.io.FileReader("src\\problems.csv"))) {
+            String line;
+            boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] cols = line.split(",", -1);
+                if (cols.length < 8) continue;
+               int idreq = Integer.parseInt(cols[6].trim());
+                String uname = cols[2].trim();
+                if (idreq == currentServiceSlot && uname.equalsIgnoreCase(username)) {
+                    targetMechanic = cols[7].trim();
+                    break;
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        if (targetMechanic.isEmpty()) {
+            materialarea.setText("No parts requested yet.");
+            return;
+        }
+
+        // ── Step 2: read cartrequest.csv filtered by customer + mechanic ──
         StringBuilder sb = new StringBuilder();
+        double grandTotal = 0;
 
         try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String line;
-            String pendingBlock = "";
-            boolean blockMatchesUser = false;
-            String currentCustomerId = "";
-
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
-                if (line.toLowerCase().startsWith("orderid")) continue; // skip header
+                if (line.toLowerCase().startsWith("orderid")) continue;
+                if (line.startsWith("---") || line.contains("GRAND TOTAL")) continue;
 
-                if (line.startsWith("---")) {
-                    if (blockMatchesUser) {
-                        sb.append(pendingBlock);
-                        sb.append("─────────────────────────\n");
-                    }
-                    pendingBlock = "";
-                    blockMatchesUser = false;
-                    currentCustomerId = "";
-                    continue;
-                }
+                String[] cols = line.split(",", -1);
+                if (cols.length < 8) continue;
 
-                String[] cols = line.split(",");
+                String cust = cols[6].trim();   // col 6 = customer
+                String mech = cols[7].trim();   // col 7 = mechanic
 
-                if (line.contains("GRAND TOTAL")) {
-                    // GRAND TOTAL row: ,,,,GRAND TOTAL: ₱xxx,customer,mechanic,customerid
-                    if (cols.length > 7 &&
-                        cols[6].trim().equalsIgnoreCase(username) &&
-                        cols[8].trim().equals(String.valueOf(currentServiceSlot))) {
-                        blockMatchesUser = true;
-                        currentCustomerId = cols[7].trim();
-                        pendingBlock += cols[4].trim() + "\n"; // "GRAND TOTAL: ₱2600"
-                    }
-                    continue;
-                }
-
-                // normal item row: orderId,category,part,qty,price,total,customer,mechanic,customerid
-                if (cols.length >= 9) {
-                    if (cols[5].trim().equalsIgnoreCase(username) &&
-                        cols[7].trim().equals(String.valueOf(currentServiceSlot))) {
-                        String custId = cols[8].trim();
-                        if (!custId.equals(currentCustomerId) && pendingBlock.isEmpty()) {
-                            pendingBlock += " Request #" + custId + "\n";
-                            currentCustomerId = custId;
-                        }
-                        pendingBlock += String.format("  #%-3s %-15s %-20s Qty:%-3s Price:%-8s Total:₱%s\n",
-                            cols[0].trim(), // orderId
-                            cols[1].trim(), // category
-                            cols[2].trim(), // part
-                            cols[3].trim(), // qty
-                            "₱" + cols[4].trim(), // price
-                            cols[5].trim()  // total
-                        );
-                    }
+                if (cust.equalsIgnoreCase(username) && mech.equalsIgnoreCase(targetMechanic)) {
+                    String part     = cols[2].trim();
+                    String qty      = cols[3].trim();
+                    String price    = cols[4].trim();
+                    String total    = cols[5].trim();
+                    try { grandTotal += Double.parseDouble(total); } catch (NumberFormatException ignored) {}
+                    sb.append(String.format("  %-20s x%-3s  ₱%s%n", part, qty, total));
                 }
             }
-
-            // catch last block
-            if (blockMatchesUser && !pendingBlock.isEmpty()) {
-                sb.append(pendingBlock);
-            }
-
-            materialarea.setText(sb.length() > 0 ? sb.toString() : "No parts requested for your account.");
-            materialarea.setCaretPosition(0);
-
         } catch (java.io.IOException e) {
             e.printStackTrace();
             materialarea.setText("Error loading materials.");
+            return;
         }
+
+        if (sb.length() == 0) {
+            materialarea.setText("No parts requested for this service.");
+            return;
+        }
+
+        sb.insert(0, "══════════════════════════\n  MATERIAL COST\n══════════════════════════\n");
+        sb.append("──────────────────────────\n");
+        sb.append(String.format("  TOTAL:              ₱%.0f%n", grandTotal));
+        sb.append("══════════════════════════\n");
+
+        materialarea.setText(sb.toString());
+        materialarea.setCaretPosition(0);
     }
     private void DashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DashboardActionPerformed
         USER.setSelectedIndex(0);
@@ -4029,10 +4043,27 @@ handleServiceCar(3);
         }
     } catch (Exception e) { e.printStackTrace(); }
 
-    // ── Update SERVPANEL2 label with car info + mechanic ──
-    servpanel.setText("  Car " + customersame + "  |  " + carName
-        + "  |  " + plateNum
-        + "  |  Mechanic: " + (assignedMechanic.isEmpty() ? "Not assigned" : assignedMechanic));
+        // ── Look up the mechanic assigned to this specific slot ──
+            String slotMechanic = "Not assigned";
+            try (BufferedReader br2 = new BufferedReader(new FileReader("src\\problems.csv"))) {
+                String line2; boolean first2 = true;
+                while ((line2 = br2.readLine()) != null) {
+                    if (first2) { first2 = false; continue; }
+                    String[] c2 = line2.split(",", -1);
+                    if (c2.length >= 8 &&
+                        Integer.parseInt(c2[6].trim()) == customersame &&
+                        c2[2].trim().equalsIgnoreCase(username) &&
+                        !c2[7].trim().isEmpty()) {
+                        slotMechanic = c2[7].trim();
+                        break;
+                    }
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+
+            // ── Update SERVPANEL2 label with car info + mechanic ──
+            servpanel.setText("  Car " + customersame + "  |  " + carName
+                + "  |  " + plateNum
+                + "  |  Mechanic: " + slotMechanic);
 
     // ── Load status and materials ──
     loadStatusFromCSV(customersame);
@@ -4484,10 +4515,10 @@ handleServiceCar(3);
                 String[] cols = line.split(",", -1);
                 if (cols.length < 7) continue;
 
-                int rissue = Integer.parseInt(cols[0].trim());
+                int idreq = Integer.parseInt(cols[6].trim());
                 String uname  = cols[2].trim();
 
-                if (rissue == repairmanIssueNum && uname.equalsIgnoreCase(customer)) {
+                if (idreq == repairmanIssueNum && uname.equalsIgnoreCase(customer)) {
                     issues.add(cols[4].trim());
                     idreqTarget = Integer.parseInt(cols[6].trim());
                     currentCar = cols[3].trim();
