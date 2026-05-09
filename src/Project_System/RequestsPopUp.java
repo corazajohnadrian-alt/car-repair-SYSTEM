@@ -26,6 +26,7 @@ public class RequestsPopUp extends javax.swing.JFrame {
     boolean isEditAllowed = false;
     DefaultTableModel model;
  
+    
     // Stored for approve / save actions
     private String currentId       = "";
     private String currentCustomer = "";

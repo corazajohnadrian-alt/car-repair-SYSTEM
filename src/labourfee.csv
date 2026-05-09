@@ -1,17 +1,23 @@
 ﻿service,labourfee
-Engine overheating,1500
-Oil leak,1000
-Brake problem,800
-Transmission Issue,3500
-Suspension noise,1200
-Steering problem,1000
-Battery issue,300
-Charging issue,800
-Lights problem,300
-Starter problem,900
-Alternator problem,1200
-Scratches,400
-Dents,600
-Broken windshield,1500
-Wheel damage,500
-Rust,700
+Overheating,2500
+Misfire,2000
+Radiator leak,1800
+Fan failure,1500
+Hard start,1800
+Poor fuel delivery,2200
+Slipping,4500
+Delayed shifting,4000
+Worn pads,1200
+Fluid leak,1800
+Noise,1500
+Worn shocks,2500
+Hard steering,2200
+Fluid leak,1700
+Battery,800
+Alternator,2000
+Smoke,2500
+Emission failure,2200
+No cooling,3000
+Flat tire,500
+Dents,3500
+Rust,4000

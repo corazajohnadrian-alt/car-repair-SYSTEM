@@ -1,1 +1,35 @@
 ﻿id,samecustomerid,customer,DATE,payment,totalcost,reciept
+1,3,adri,05/09/2026 19:54:12,CASH,5000,"================================
+          FIXO
+  Cuenco Avenue in Cebu City,
+   Philippines, 09671842210
+================================
+  Customer : adri
+  Car      : 32
+  Car Slot : 3
+  Req #    : 3
+  Date     : 05/09/2026 19:54:12
+  Payment  : CASH
+--------------------------------
+  LABOUR FEES
+--------------------------------
+  Radiator leak          ₱1,800
+  poor fuel delivery     ₱2,200
+  OTHERS                 ₱0
+  Labour Subtotal:       ₱4,000
+--------------------------------
+  PARTS
+--------------------------------
+  Fuel Pump          x1   ₱550
+  ATF                x1   ₱450
+  Parts Subtotal:        ₱1,000
+--------------------------------
+================================
+  TOTAL    :        ₱5,000
+  CASH     :        ₱6,700
+  CHANGE   :        ₱1,700
+================================
+   Thanks For Your Business...!
+   Software by FIXO
+================================
+"

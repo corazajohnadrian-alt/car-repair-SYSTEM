@@ -1909,10 +1909,7 @@ private MediaPlayer mediaPlayer;
 
         partslist.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Category", "Parts", "QTY"
@@ -2913,8 +2910,8 @@ private MediaPlayer mediaPlayer;
                 if (line.contains("GRAND TOTAL")) {
                     // GRAND TOTAL row: ,,,,GRAND TOTAL: ₱xxx,customer,mechanic,customerid
                     if (cols.length > 7 &&
-                        cols[5].trim().equalsIgnoreCase(username) &&
-                        cols[7].trim().equals(String.valueOf(currentServiceSlot))) {
+                        cols[6].trim().equalsIgnoreCase(username) &&
+                        cols[8].trim().equals(String.valueOf(currentServiceSlot))) {
                         blockMatchesUser = true;
                         currentCustomerId = cols[7].trim();
                         pendingBlock += cols[4].trim() + "\n"; // "GRAND TOTAL: ₱2600"
@@ -2924,8 +2921,8 @@ private MediaPlayer mediaPlayer;
 
                 // normal item row: orderId,category,part,qty,price,total,customer,mechanic,customerid
                 if (cols.length >= 9) {
-                    if (cols[6].trim().equalsIgnoreCase(username) &&
-                        cols[8].trim().equals(String.valueOf(currentServiceSlot))) {
+                    if (cols[5].trim().equalsIgnoreCase(username) &&
+                        cols[7].trim().equals(String.valueOf(currentServiceSlot))) {
                         String custId = cols[8].trim();
                         if (!custId.equals(currentCustomerId) && pendingBlock.isEmpty()) {
                             pendingBlock += " Request #" + custId + "\n";
@@ -4432,20 +4429,21 @@ handleServiceCar(3);
     public boolean isReadyForPickup(int carSlot) {
     String customer = customerframe.username;
 
-    // Step 1: Resolve repairmanIssueNum from problems.csv (same as loadStatusFromCSV)
-    int repairmanIssueNum = carSlot; // fallback
-    try (BufferedReader br = new BufferedReader(new FileReader("src\\problems.csv"))) {
-        String line; boolean first = true;
-        while ((line = br.readLine()) != null) {
-            if (first) { first = false; continue; }
-            String[] c = line.split(",", -1);
-            if (c.length < 8) continue;
-            if (c[2].trim().equalsIgnoreCase(customer)) {
-                repairmanIssueNum = Integer.parseInt(c[0].trim());
-                break;
+    // Step 1: Resolve repairmanIssueNum from problems.csv
+        int repairmanIssueNum = carSlot; // fallback
+        try (BufferedReader br = new BufferedReader(new FileReader("src\\problems.csv"))) {
+            String line; boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] c = line.split(",", -1);
+                if (c.length < 8) continue;
+                if (c[2].trim().equalsIgnoreCase(customer) &&
+                    c[0].trim().equals(String.valueOf(carSlot))) {   // ← add this check
+                    repairmanIssueNum = Integer.parseInt(c[0].trim());
+                    break;
+                }
             }
-        }
-    } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { e.printStackTrace(); }
 
     // Step 2: Check updatestatus.csv using the resolved repairmanIssueNum
     java.io.File file = new java.io.File("src\\updatestatus.csv");
@@ -4475,6 +4473,8 @@ handleServiceCar(3);
         String problemsPath = "src\\problems.csv";
         List<String> issues = new ArrayList<>();
         int idreqTarget = -1;
+        String requestMechanic = "";
+
 
         try (BufferedReader br = new BufferedReader(new FileReader(problemsPath))) {
             String line;
@@ -4488,10 +4488,12 @@ handleServiceCar(3);
                 String uname  = cols[2].trim();
 
                 if (rissue == repairmanIssueNum && uname.equalsIgnoreCase(customer)) {
-                    issues.add(cols[4].trim());          // problem name
-                    idreqTarget = Integer.parseInt(cols[6].trim()); // idreq
-                        currentCar = cols[3].trim();  // ← ADD THIS (col 3 = car)
-
+                    issues.add(cols[4].trim());
+                    idreqTarget = Integer.parseInt(cols[6].trim());
+                    currentCar = cols[3].trim();
+                    if (requestMechanic.isEmpty() && cols.length >= 8) {
+                        requestMechanic = cols[7].trim();
+                    }
                 }
             }
         } catch (Exception e) { e.printStackTrace(); }
@@ -4528,14 +4530,16 @@ handleServiceCar(3);
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 if (line.toLowerCase().startsWith("orderid")) continue;
-                if (line.startsWith("---") || line.contains("GRAND TOTAL")) continue;
+                if (line.startsWith("---") || line.contains("GRAND TOTAL")) continue; // ← already there ✅
+
 
                 String[] cols = line.split(",", -1);
-                if (cols.length >= 9) {
+                if (cols.length >= 8) {
                     String cust = cols[6].trim(); // col 6 = customer
-                    String slot = cols[8].trim(); // col 8 = customerid (car slot 1, 2, or 3)
+                    String mech = cols[7].trim(); // col 7 = mechanic
                     if (cust.equalsIgnoreCase(customer) &&
-                        slot.equals(String.valueOf(repairmanIssueNum))) { // match by car slot directly
+                        !requestMechanic.isEmpty() &&
+                        mech.equalsIgnoreCase(requestMechanic)) { // match by car slot directly
                         String partName = cols[2].trim();
                         String qty      = cols[3].trim();
                         String total    = cols[5].trim();

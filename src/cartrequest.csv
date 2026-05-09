@@ -1,7 +1,8 @@
 orderId,category,part,qty,price,total,customer,mechanic,mechaniccustomerspecificcustomer,idcustomer
 
 1,Transmission System,ATF,2,450,900,fhel,SEV,1
-,,,,GRAND TOTAL: ₱900,fhel,SEV,11,Fuel System,Fuel Pump,1,550,550,adri,SEV,1
+,,,,GRAND TOTAL: ₱900,fhel,SEV,1
+1,Fuel System,Fuel Pump,1,550,550,adri,SEV,1
 2,Transmission System,ATF,1,450,450,adri,SEV,1
 ,,,,GRAND TOTAL: ₱1000,adri,SEV,1
 ---,---,---,---,---,---,---,---,---
