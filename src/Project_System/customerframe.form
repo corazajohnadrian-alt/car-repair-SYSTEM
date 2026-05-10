@@ -1521,13 +1521,13 @@
                                           <Component id="button4" alignment="3" min="-2" pref="74" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="3" attributes="0">
-                                          <Component id="label1" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Group type="103" alignment="3" groupAlignment="3" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                                               <Component id="label3" alignment="3" min="-2" max="-2" attributes="0"/>
                                               <Component id="label4" alignment="3" min="-2" max="-2" attributes="0"/>
                                               <Component id="label2" alignment="3" min="-2" max="-2" attributes="0"/>
                                           </Group>
+                                          <Component id="label1" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace pref="17" max="32767" attributes="0"/>
                                   </Group>
