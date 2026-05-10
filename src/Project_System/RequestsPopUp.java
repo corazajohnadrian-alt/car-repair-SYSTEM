@@ -32,6 +32,7 @@ public class RequestsPopUp extends javax.swing.JFrame {
     private String currentCustomer = "";
     private String currentMechanic = "";
     private String currentVehicle  = "";
+    private String mediaFilePath = "";
  
     // CSV paths — match what the rest of the project uses
     private static final String PROBLEMS_CSV    = "src\\problems.csv";
@@ -174,6 +175,7 @@ public class RequestsPopUp extends javax.swing.JFrame {
     loadCarDetails(customer, id);
     loadProblems(id, customer);
     loadPartsAndExpenses(id, customer);
+    loadMediaPath(id, customer);
 
     this.setVisible(true);
     this.pack();
@@ -359,6 +361,8 @@ public class RequestsPopUp extends javax.swing.JFrame {
         problemTextArea = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         expensesTable = new javax.swing.JTable();
+        backbutton = new javax.swing.JButton();
+        viewphotoorvideo = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Service Request");
@@ -384,7 +388,7 @@ public class RequestsPopUp extends javax.swing.JFrame {
         );
         CarpictureLayout.setVerticalGroup(
             CarpictureLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 181, Short.MAX_VALUE)
+            .addGap(0, 160, Short.MAX_VALUE)
         );
 
         vehicleLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -463,6 +467,21 @@ public class RequestsPopUp extends javax.swing.JFrame {
         expensesTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane3.setViewportView(expensesTable);
 
+        backbutton.setText("Back");
+        backbutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backbuttonActionPerformed(evt);
+            }
+        });
+
+        viewphotoorvideo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        viewphotoorvideo.setText("VIEW videos/photo");
+        viewphotoorvideo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewphotoorvideoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout requestsPopUpLayout = new javax.swing.GroupLayout(requestsPopUp);
         requestsPopUp.setLayout(requestsPopUpLayout);
         requestsPopUpLayout.setHorizontalGroup(
@@ -472,11 +491,13 @@ public class RequestsPopUp extends javax.swing.JFrame {
                 .addGroup(requestsPopUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, requestsPopUpLayout.createSequentialGroup()
                         .addGroup(requestsPopUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3)
                             .addGroup(requestsPopUpLayout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(requestsPopUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
+                                    .addComponent(viewphotoorvideo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                         .addGap(30, 30, 30))
                     .addGroup(requestsPopUpLayout.createSequentialGroup()
                         .addGroup(requestsPopUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -489,15 +510,16 @@ public class RequestsPopUp extends javax.swing.JFrame {
                                     .addComponent(plateNumberLabel)
                                     .addComponent(mechanicLabel)
                                     .addComponent(ownerLabel)))
-                            .addComponent(serviceIdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(serviceIdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(backbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(302, Short.MAX_VALUE))))
         );
         requestsPopUpLayout.setVerticalGroup(
             requestsPopUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(requestsPopUpLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(serviceIdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(requestsPopUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(requestsPopUpLayout.createSequentialGroup()
                         .addComponent(Details, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -510,13 +532,18 @@ public class RequestsPopUp extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(ownerLabel))
                     .addComponent(Carpicture, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(31, 31, 31)
-                .addGroup(requestsPopUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(75, 75, 75))
+                .addGap(14, 14, 14)
+                .addGroup(requestsPopUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(requestsPopUpLayout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(viewphotoorvideo, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(backbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16))
         );
 
         Carpicture.getAccessibleContext().setAccessibleName("CarPicture");
@@ -540,6 +567,54 @@ public class RequestsPopUp extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void backbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backbuttonActionPerformed
+        dispose();
+    }//GEN-LAST:event_backbuttonActionPerformed
+
+    private void viewphotoorvideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewphotoorvideoActionPerformed
+       if (mediaFilePath.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "No photo or video uploaded for this request.");
+        return;
+    }
+
+    java.io.File mediaFile = new java.io.File(mediaFilePath);
+    if (!mediaFile.exists()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "File not found:\n" + mediaFilePath);
+        return;
+    }
+
+    String path = mediaFilePath.toLowerCase();
+
+    if (path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".png")) {
+        // Show image in a popup dialog
+        javax.swing.ImageIcon icon = new javax.swing.ImageIcon(mediaFilePath);
+        java.awt.Image scaled = icon.getImage().getScaledInstance(600, 400, java.awt.Image.SCALE_SMOOTH);
+        javax.swing.JLabel imgLabel = new javax.swing.JLabel(new javax.swing.ImageIcon(scaled));
+
+        javax.swing.JDialog imgDialog = new javax.swing.JDialog(this, "Photo", true);
+        imgDialog.setDefaultCloseOperation(javax.swing.JDialog.DISPOSE_ON_CLOSE);
+        imgDialog.add(imgLabel);
+        imgDialog.pack();
+        imgDialog.setLocationRelativeTo(this);
+        imgDialog.setVisible(true);
+
+    } else if (path.endsWith(".mp4")) {
+        // Open video with default system player
+        try {
+            java.awt.Desktop.getDesktop().open(mediaFile);
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Cannot open video: " + e.getMessage());
+        }
+    } else {
+        // Unknown type — try opening with default app
+        try {
+            java.awt.Desktop.getDesktop().open(mediaFile);
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Cannot open file: " + e.getMessage());
+        }
+    }
+    }//GEN-LAST:event_viewphotoorvideoActionPerformed
 
      private void loadProblems(String idreq, String customer) {
         StringBuilder sb = new StringBuilder();
@@ -565,6 +640,51 @@ public class RequestsPopUp extends javax.swing.JFrame {
         problemTextArea.setText(sb.toString().trim());
         problemTextArea.setCaretPosition(0);
     }
+     
+     private void loadMediaPath(String idreq, String customer) {
+    mediaFilePath = "";
+    java.io.File file = new java.io.File("src\\pictures.csv");
+    if (!file.exists()) {
+        System.out.println("pictures.csv not found!");
+        viewphotoorvideo.setEnabled(false);
+        return;
+    }
+
+    try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
+        String line;
+        boolean first = true;
+        while ((line = br.readLine()) != null) {
+            if (first) { first = false; continue; }
+            if (line.trim().isEmpty()) continue;
+
+            String[] c = line.split(",", -1);
+            if (c.length < 5) continue;
+
+            String rowCustomer = c[2].trim();
+            String rowPath     = c[4].trim();
+
+            // Debug print — remove after fixing
+            System.out.println("Checking row: customer=" + rowCustomer 
+                + " | idreq col=" + c[1].trim() 
+                + " | path=" + rowPath);
+
+            // Match by customer + non-empty path
+            if (rowCustomer.equalsIgnoreCase(customer) && !rowPath.isEmpty()) {
+                mediaFilePath = rowPath;
+                System.out.println("Found media: " + mediaFilePath);
+                break;
+            }
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+
+    viewphotoorvideo.setEnabled(!mediaFilePath.isEmpty());
+    viewphotoorvideo.setToolTipText(mediaFilePath.isEmpty() 
+        ? "No media uploaded" 
+        : mediaFilePath);
+
+    System.out.println("Final mediaFilePath: '" + mediaFilePath + "'");
+    System.out.println("Button enabled: " + !mediaFilePath.isEmpty());
+}
     
     
 
@@ -602,6 +722,7 @@ public class RequestsPopUp extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JPanel Carpicture;
     public javax.swing.JLabel Details;
+    public javax.swing.JButton backbutton;
     public javax.swing.JTable expensesTable;
     public javax.swing.JPopupMenu jPopupMenu1;
     public javax.swing.JScrollPane jScrollPane1;
@@ -615,5 +736,6 @@ public class RequestsPopUp extends javax.swing.JFrame {
     public javax.swing.JPanel requestsPopUp;
     public javax.swing.JLabel serviceIdLabel;
     public javax.swing.JLabel vehicleLabel;
+    public javax.swing.JButton viewphotoorvideo;
     // End of variables declaration//GEN-END:variables
 }
