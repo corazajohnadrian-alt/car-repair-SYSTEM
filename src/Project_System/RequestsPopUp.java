@@ -640,7 +640,7 @@ public class RequestsPopUp extends javax.swing.JFrame {
         problemTextArea.setText(sb.toString().trim());
         problemTextArea.setCaretPosition(0);
     }
-     
+     //sas
      private void loadMediaPath(String idreq, String customer) {
     mediaFilePath = "";
     java.io.File file = new java.io.File("src\\pictures.csv");
