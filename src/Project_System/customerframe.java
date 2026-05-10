@@ -56,7 +56,7 @@ import javax.swing.table.TableCellRenderer;
 public class customerframe extends javax.swing.JFrame {
 
     
-    static String username = "adri"; // FOR CHATT
+    static String username = "ad"; // FOR CHATT
 
             File carpic;
             private JFXPanel fxPanel;
@@ -105,6 +105,19 @@ private MediaPlayer mediaPlayer;
     private String autoAssignedMechanic = ""; // repairman picked at submit time
     private static final String[] ALL_MECHANICS = {"SEV", "Sherwin", "Edmer"};
 
+    private static final String[] SLOT_LABELS = {
+    "7 AM - 9 AM",
+    "9 AM - 12 PM",
+    "1 PM - 3 PM",
+    "3 PM - 5 PM"
+    };
+
+    // Slot start times in fractional hours (e.g. 13.0 = 1 PM)
+    private static final double[] SLOT_START_HOURS = { 7.0, 9.0, 13.0, 15.0 };
+
+    // Slot durations in hours
+    private static final double[] SLOT_DURATIONS = { 2.0, 3.0, 2.0, 2.0 };
+ 
     
     public customerframe(String username) {
         initComponents();
@@ -678,7 +691,7 @@ private MediaPlayer mediaPlayer;
                         .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -689,7 +702,7 @@ private MediaPlayer mediaPlayer;
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane12)
                     .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(83, Short.MAX_VALUE))
         );
 
         jButton11.setBackground(new java.awt.Color(0, 153, 153));
@@ -1070,8 +1083,18 @@ private MediaPlayer mediaPlayer;
         });
 
         button4.setText("3 PM - 5 PM");
+        button4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button4ActionPerformed(evt);
+            }
+        });
 
         button3.setText("1 PM - 3 PM");
+        button3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button3ActionPerformed(evt);
+            }
+        });
 
         label1.setText("jLabel9");
 
@@ -1091,24 +1114,24 @@ private MediaPlayer mediaPlayer;
                 .addGap(320, 320, 320))
             .addGroup(timeslotLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(33, 33, 33)
-                .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
-                .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(38, 38, 38))
-            .addGroup(timeslotLayout.createSequentialGroup()
-                .addGap(73, 73, 73)
-                .addComponent(label1)
-                .addGap(150, 150, 150)
-                .addComponent(label2)
-                .addGap(148, 148, 148)
-                .addComponent(label3)
+                .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(timeslotLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(label1)))
+                .addGap(49, 49, 49)
+                .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(label4)
-                .addGap(85, 85, 85))
+                .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label3))
+                .addGap(82, 82, 82)
+                .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(label4)
+                    .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(38, 38, 38))
         );
         timeslotLayout.setVerticalGroup(
             timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1122,11 +1145,10 @@ private MediaPlayer mediaPlayer;
                     .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(button4, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(label3)
-                        .addComponent(label4)
-                        .addComponent(label2))
+                .addGroup(timeslotLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(label3)
+                    .addComponent(label4)
+                    .addComponent(label2)
                     .addComponent(label1))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
@@ -1137,10 +1159,11 @@ private MediaPlayer mediaPlayer;
             scheduleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(scheduleLayout.createSequentialGroup()
                 .addGap(55, 55, 55)
-                .addGroup(scheduleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(timeslot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(datee, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addComponent(datee, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(167, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, scheduleLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(timeslot, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         scheduleLayout.setVerticalGroup(
             scheduleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1238,7 +1261,7 @@ private MediaPlayer mediaPlayer;
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(next, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(40, Short.MAX_VALUE))
             .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
                     .addContainerGap(15, Short.MAX_VALUE)
@@ -1250,7 +1273,7 @@ private MediaPlayer mediaPlayer;
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
                 .addGap(17, 17, 17)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 403, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 457, Short.MAX_VALUE)
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ADDCAR, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(back, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1763,7 +1786,7 @@ private MediaPlayer mediaPlayer;
                                 .addComponent(SENDBUTTONMESSAGE, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane14))
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         jButton4.setBackground(new java.awt.Color(0, 153, 153));
@@ -2042,7 +2065,7 @@ private MediaPlayer mediaPlayer;
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addComponent(paymentlayerpanel, javax.swing.GroupLayout.PREFERRED_SIZE, 900, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2200,7 +2223,137 @@ private MediaPlayer mediaPlayer;
     }// </editor-fold>//GEN-END:initComponents
    
     
-    
+    private int countBusyMechanics(String dateKey, String slotLabel) {
+
+        // Index of the slot the customer is asking about
+        int targetSlotIndex = slotIndexOf(slotLabel);
+        if (targetSlotIndex < 0) return 0; // unknown slot → treat as free
+
+        java.util.Set<String> busy = new java.util.HashSet<>();
+
+        java.io.File picturesFile = new java.io.File("src\\pictures.csv");
+        if (!picturesFile.exists()) return 0;
+
+        try (java.io.BufferedReader br = new java.io.BufferedReader(
+                new java.io.FileReader(picturesFile))) {
+
+            String line;
+            boolean first = true;
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (first) { first = false; continue; } // skip header
+
+                // pictures.csv cols:
+                //   id(0), repairmanissuenumber(1), customer(2),
+                //   mechanic(3), pathfile(4), date(5), time(6)
+                String[] c = line.split(",", -1);
+                if (c.length < 7) continue;
+
+                String mechanic  = c[3].trim();
+                String rowDate   = c[5].trim();
+                String rowSlot   = c[6].trim().replaceAll("^\"|\"$", ""); // strip quotes
+                String rowCustomer = c[2].trim();
+
+                // Only consider bookings on the same date
+                if (!rowDate.equalsIgnoreCase(dateKey)) continue;
+                if (mechanic.isEmpty() || mechanic.equalsIgnoreCase("N/A")) continue;
+
+                // Find which slot this booking starts in
+                int bookingSlotIndex = slotIndexOf(rowSlot);
+                if (bookingSlotIndex < 0) continue; // unrecognised slot
+
+                // Look up estimated repair hours for this booking
+                double repairHours = getEstimatedHours(rowCustomer, mechanic);
+
+                // Compute the end time of the repair
+                double repairStart = SLOT_START_HOURS[bookingSlotIndex];
+                double repairEnd   = repairStart + repairHours;
+
+                // The mechanic is busy during any slot that OVERLAPS the repair window.
+                // A slot overlaps if: slotStart < repairEnd  AND  slotEnd > repairStart
+                // (strict less-than on repairEnd so a slot starting exactly at repairEnd
+                //  is considered FREE — matching the problem-statement example.)
+                double targetStart = SLOT_START_HOURS[targetSlotIndex];
+                double targetEnd   = targetStart + SLOT_DURATIONS[targetSlotIndex];
+
+                boolean overlaps = (targetStart < repairEnd) && (targetEnd > repairStart);
+
+                if (overlaps) {
+                    busy.add(mechanic.toLowerCase());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return busy.size();
+    }
+
+
+    // ── Helper: slot label → index ────────────────────────────────────────────────
+    private int slotIndexOf(String label) {
+        if (label == null) return -1;
+        String trimmed = label.trim();
+        for (int i = 0; i < SLOT_LABELS.length; i++) {
+            if (SLOT_LABELS[i].equalsIgnoreCase(trimmed)) return i;
+        }
+        return -1;
+    }
+
+
+    // ── Helper: look up estimated repair hours from estimatedtime.csv ─────────────
+    //
+    // estimatedtime.csv columns:
+    //   id(0), customercarid(1), customer(2), mechanic(3), estimatedtimetofinish(4)
+    //
+    // Returns the hours as a double; defaults to slot length (no overflow) when
+    // no record is found so existing behaviour is preserved.
+    private double getEstimatedHours(String customer, String mechanic) {
+
+        java.io.File file = new java.io.File("src\\estimatedtime.csv");
+        if (!file.exists()) return 0.0; // no estimate → assume repair fits in its slot
+
+        try (java.io.BufferedReader br = new java.io.BufferedReader(
+                new java.io.FileReader(file))) {
+
+            String line;
+            boolean first = true;
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                if (first) { first = false; continue; }
+
+                String[] c = line.split(",", -1);
+                if (c.length < 5) continue;
+
+                String rowCustomer = c[2].trim();
+                String rowMechanic = c[3].trim();
+                String hoursStr    = c[4].trim();
+
+                if (rowCustomer.equalsIgnoreCase(customer) &&
+                    rowMechanic.equalsIgnoreCase(mechanic)) {
+                    try {
+                    // Strip any non-numeric text e.g. "5 Hours" → "5"
+                    String numOnly = hoursStr.replaceAll("[^0-9.]", "").trim();
+                    if (!numOnly.isEmpty()) {
+                        return Double.parseDouble(numOnly);
+                    }
+                } catch (NumberFormatException ignored) {}
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // No matching record found → 0 hours overflow (mechanic free after their slot)
+        return 0.0;
+    }
+
     private void checkAndDisableTimeSlots() {
         java.util.Date chosen = datee.getDate();
 
@@ -2239,10 +2392,10 @@ private MediaPlayer mediaPlayer;
         String[] slotLabels  = {"7 AM - 9 AM", "9 AM - 12 PM", "1 PM - 3 PM", "3 PM - 5 PM"};
         int[]    pastCutoffs = {9,              12,              15,             17};
         javax.swing.JLabel[] labels = {label1, label2, label3, label4};
+        javax.swing.JToggleButton[] slotBtns = {button1, button2, button3, button4};
 
         for (int s = 0; s < 4; s++) {
             String slotLabel = slotLabels[s];
-            javax.swing.JToggleButton[] slotBtns = {button1, button2, button3, button4};
 
             int busyCount = countBusyMechanics(dateKey, slotLabel);
             int freeCount = totalMechanics - busyCount;
@@ -2265,11 +2418,17 @@ private MediaPlayer mediaPlayer;
             } else if (totalMechanics == 0) {
                 labels[s].setText(slotLabels[s]);
                 labels[s].setForeground(java.awt.Color.DARK_GRAY);
-            } else if (freeCount > 0) {
+           } else if (freeCount > 0) {
+            if (busyCount > 0) {
+                labels[s].setText("(" + freeCount + " mechanic"
+                    + (freeCount > 1 ? "s" : "") + " left)");
+                labels[s].setForeground(new java.awt.Color(255, 140, 0));
+            } else {
                 labels[s].setText("(" + freeCount + " mechanic"
                     + (freeCount > 1 ? "s" : "") + " free)");
                 labels[s].setForeground(new java.awt.Color(0, 153, 0));
-            } else {
+            }
+        } else {
                 labels[s].setText("(fully booked)");
                 labels[s].setForeground(java.awt.Color.RED);
             }
@@ -2296,32 +2455,7 @@ private MediaPlayer mediaPlayer;
         return list;
     }
     
-    private int countBusyMechanics(String dateKey, String slotLabel) {
-        java.util.Set<String> busy = new java.util.HashSet<>();
-        java.io.File file = new java.io.File("src\\pictures.csv");
-        if (!file.exists()) return 0;
-        try (java.io.BufferedReader br = new java.io.BufferedReader(
-                new java.io.FileReader(file))) {
-            String line;
-            boolean first = true;
-            while ((line = br.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty()) continue;
-                if (first) { first = false; continue; }
-                String[] c = line.split(",", -1);
-                if (c.length < 7) continue;
-                String mechanic = c[3].trim();
-                String rowDate  = c[5].trim();
-                String rowSlot  = c[6].trim();
-                if (rowDate.equalsIgnoreCase(dateKey) &&
-                    rowSlot.equalsIgnoreCase(slotLabel) &&
-                    !mechanic.isEmpty() && !mechanic.equalsIgnoreCase("N/A")) {
-                    busy.add(mechanic.toLowerCase());
-                }
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return busy.size();
-    }
+    
    
     public void buttongroup(){
         buttonGroup2.add(button1);
@@ -2540,35 +2674,6 @@ private MediaPlayer mediaPlayer;
 
     }
     
-    private void refreshTimeSlots() {
-     java.util.Date picked = datee.getDate();
-     if (picked == null) return;
-     String dateStr = new java.text.SimpleDateFormat("MMM/dd/yyyy").format(picked);
-
-    javax.swing.JToggleButton[] slotBtns = {button1, button2, button3, button4};
-    String[] slotNames = {
-        "7:00 AM - 9:00 AM",
-        "9:00 AM - 12:00 PM",
-        "1:00 PM - 3:00 PM",
-        "3:00 PM - 6:00 PM"
-    };
-
-    for (int i = 0; i < slotBtns.length; i++) {
-        final String slotName = slotNames[i];
-        slotBtns[i].addActionListener(e -> {
-            // Deselect all others
-            for (javax.swing.JToggleButton sb : slotBtns) {
-                if (sb != e.getSource()) sb.setSelected(false);
-            }
-            // If this one is now selected, store the slot
-            if (((javax.swing.JToggleButton) e.getSource()).isSelected()) {
-                selectedTimeSlot = slotName;
-            } else {
-                selectedTimeSlot = ""; // user untoggled
-            }
-        });
-    }
-    }
 
  /**
   * Reads pictures.csv and returns which mechanics are already booked
@@ -3255,7 +3360,7 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
             autoAssignedMechanic = free.get(new java.util.Random().nextInt(free.size()));
             System.out.println("Auto-assigned: " + autoAssignedMechanic);
 
-            saveToPicturesCSV(repairmanidissue, dateStr, selectedTimeSlot, autoAssignedMechanic);
+            saveToPicturesCSV(repairmanidissue, dateStr, selectedTimeSlot, autoAssignedMechanic, selectedFilePath);
             updateMechanicInProblemsCSV(repairmanidissue, autoAssignedMechanic);
 
             assignedMechanic = autoAssignedMechanic;
@@ -3273,32 +3378,35 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
     if (!mechanic.isEmpty()) {
         patchRepairmanInCSV(repairmanidissue, idreq, mechanic);
         savePictureToCSV(repairmanidissue, idreq, mechanic);
+        updateMechanicInProblemsCSV(repairmanidissue, mechanic); // ← ADD THIS
     }
 }
-    private void saveToPicturesCSV(int repairmanIssueNum, String date, String timeslot, String mechanic) {
-    java.io.File file = new java.io.File("src\\pictures.csv");
-    boolean isNew = !file.exists() || file.length() == 0;
+    private void saveToPicturesCSV(int repairmanIssueNum, String date, String timeslot, String mechanic, String filePath) {
+        java.io.File file = new java.io.File("src\\pictures.csv");
+        boolean isNew = !file.exists() || file.length() == 0;
 
-    int nextId = 1;
-    if (!isNew) {
-        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
-            String line, last = null;
-            while ((line = br.readLine()) != null)
-                if (!line.trim().isEmpty()) last = line;
-            if (last != null && !last.startsWith("id")) {
-                try { nextId = Integer.parseInt(last.split(",")[0].trim()) + 1; }
-                catch (Exception ignored) {}
-            }
+        int nextId = 1;
+        if (!isNew) {
+            try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
+                String line, last = null;
+                while ((line = br.readLine()) != null)
+                    if (!line.trim().isEmpty()) last = line;
+                if (last != null && !last.startsWith("id")) {
+                    try { nextId = Integer.parseInt(last.split(",")[0].trim()) + 1; }
+                    catch (Exception ignored) {}
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(file, true))) {
+            if (isNew) pw.println("id,repairmanissuenumber,customer,mechanic,pathfile,date,time");
+            // Wrap filePath in quotes to handle commas/spaces in folder names
+            pw.printf("%d,%d,%s,%s,\"%s\",%s,%s%n",
+                nextId, repairmanIssueNum, username, mechanic, filePath, date, timeslot);
+            selectedFilePath = ""; // clear after saving
+            System.out.println("Saved to pictures.csv → " + mechanic + " | " + date + " | " + timeslot + " | " + filePath);
         } catch (Exception e) { e.printStackTrace(); }
     }
-
-    try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(file, true))) {
-        if (isNew) pw.println("id,repairmanissuenumber,customer,mechanic,pathfile,date,time");
-        pw.printf("%d,%d,%s,%s,%s,%s,%s%n",
-            nextId, repairmanIssueNum, username, mechanic, "", date, timeslot);
-        System.out.println("Saved to pictures.csv → " + mechanic + " | " + date + " | " + timeslot);
-    } catch (Exception e) { e.printStackTrace(); }
-}
 
     private void updateMechanicInProblemsCSV(int repairmanIssueNum, String mechanic) {
         java.io.File file = new java.io.File(problemsfile);
@@ -3355,12 +3463,13 @@ private void saveHistoryToCSV(java.util.List<Object[]> rows, String[] columns) {
         for (String line : lines) {
             String[] c = line.split(",", -1);
             // Check if this row matches our new submission
-            if (c.length >= 8
-                    && !c[0].trim().equalsIgnoreCase("repairmanissuenumber") // skip header
-                    && c[0].trim().equals(String.valueOf(repairmanidissue))
-                    && c[2].trim().equalsIgnoreCase(username)
-                    && c[6].trim().equals(String.valueOf(idreq))
-                    && c[7].trim().isEmpty()) {           // only blank ones
+            // AFTER — pad short rows first:
+                if (c.length < 8) c = java.util.Arrays.copyOf(c, 8);
+                if (!c[0].trim().equalsIgnoreCase("repairmanissuenumber")
+                        && c[0].trim().equals(String.valueOf(repairmanidissue))
+                        && c[2].trim().equalsIgnoreCase(username)
+                        && c[6].trim().equals(String.valueOf(idreq))
+                        && (c[7] == null || c[7].trim().isEmpty())) {
                 c[7] = mechanic;
                 pw.println(String.join(",", c));
             } else {
@@ -4457,6 +4566,14 @@ handleServiceCar(3);
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_button1ActionPerformed
+
+    private void button3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_button3ActionPerformed
+
+    private void button4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_button4ActionPerformed
     public boolean isReadyForPickup(int carSlot) {
     String customer = customerframe.username;
 

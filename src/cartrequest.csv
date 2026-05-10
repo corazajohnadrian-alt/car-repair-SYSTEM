@@ -1,19 +1,4 @@
 orderId,category,part,qty,price,total,customer,mechanic,mechaniccustomerspecificcustomer,idcustomer
-
-1,Transmission System,ATF,2,450,900,fhel,SEV,1
-,,,,GRAND TOTAL: ₱900,fhel,SEV,1
-1,Fuel System,Fuel Pump,1,550,550,adri,SEV,1
-2,Transmission System,ATF,1,450,450,adri,SEV,1
-,,,,GRAND TOTAL: ₱1000,adri,SEV,1
----,---,---,---,---,---,---,---,---
-1,Transmission System,ATF,1,450,450,adri,Sherwin,1
-2,Fuel System,Fuel Pump,1,550,550,adri,Sherwin,1
-,,,,GRAND TOTAL: ₱1000,adri,Sherwin,1
----,---,---,---,---,---,---,---,---
-1,Transmission System,ATF,1,450,450,adri,Sherwin,2
-,,,,GRAND TOTAL: ₱450,adri,Sherwin,2
----,---,---,---,---,---,---,---,---
-1,Transmission System,ATF,1,450,450,adri,Sherwin,3
-2,Fuel System,Fuel Pump,1,550,550,adri,Sherwin,3
-,,,,GRAND TOTAL: ₱1000,adri,Sherwin,3
+1,Transmission System,ATF,2,450,900,ad,SEV,1
+,,,,GRAND TOTAL: ₱900,ad,SEV,1
 ---,---,---,---,---,---,---,---,---
