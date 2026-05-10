@@ -117,6 +117,7 @@ public class mechanicframe extends javax.swing.JFrame {
         jLabel23 = new Project_System.Design.RoundedLogo();
         jLabel24 = new javax.swing.JLabel();
         jButton4 = new Project_System.Design.ModernButton();
+        jLabel29 = new Project_System.Design.RoundedLogo();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         Dashboard = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -176,9 +177,7 @@ public class mechanicframe extends javax.swing.JFrame {
         jLabel28 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(1280, 720));
         setMinimumSize(new java.awt.Dimension(1280, 720));
-        setPreferredSize(new java.awt.Dimension(1280, 720));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -263,6 +262,11 @@ public class mechanicframe extends javax.swing.JFrame {
             }
         });
 
+        jLabel29.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Project_System/resources/logo.png"))); // NOI18N
+        jLabel29.setMaximumSize(new java.awt.Dimension(100, 100));
+        jLabel29.setMinimumSize(new java.awt.Dimension(100, 100));
+        jLabel29.setPreferredSize(new java.awt.Dimension(100, 100));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -281,6 +285,11 @@ public class mechanicframe extends javax.swing.JFrame {
                         .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(16, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGap(41, 41, 41)
+                    .addComponent(jLabel29, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(209, Short.MAX_VALUE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -305,6 +314,11 @@ public class mechanicframe extends javax.swing.JFrame {
                 .addGap(62, 62, 62)
                 .addComponent(jButton4)
                 .addContainerGap(111, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGap(27, 27, 27)
+                    .addComponent(jLabel29, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(633, Short.MAX_VALUE)))
         );
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 740));
@@ -1825,6 +1839,7 @@ public class mechanicframe extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel4;
