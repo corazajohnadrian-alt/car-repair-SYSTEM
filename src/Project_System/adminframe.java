@@ -183,8 +183,8 @@ private void setupMechanicComboBox() {
         AdminAbtn = new Project_System.Design.ModernButton();
         AdminIbtn = new Project_System.Design.ModernButton();
         AdminRpbtn = new Project_System.Design.ModernButton();
-        jButton4 = new Project_System.Design.ModernButton();
         AdminRpbtn1 = new Project_System.Design.ModernButton();
+        jButton4 = new Project_System.Design.ModernButton();
         Tab = new javax.swing.JTabbedPane();
         DashboardPanel = new javax.swing.JPanel();
         DashboardLetter = new javax.swing.JLabel();
@@ -395,16 +395,6 @@ private void setupMechanicComboBox() {
             }
         });
 
-        jButton4.setBackground(new java.awt.Color(106, 141, 146));
-        jButton4.setFont(new java.awt.Font("Roboto", 1, 11)); // NOI18N
-        jButton4.setForeground(new java.awt.Color(255, 255, 255));
-        jButton4.setText("Log out");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-
         AdminRpbtn1.setBackground(new java.awt.Color(106, 141, 146));
         AdminRpbtn1.setFont(new java.awt.Font("Roboto", 1, 16)); // NOI18N
         AdminRpbtn1.setForeground(new java.awt.Color(255, 255, 255));
@@ -418,14 +408,20 @@ private void setupMechanicComboBox() {
             }
         });
 
+        jButton4.setBackground(new java.awt.Color(0, 153, 153));
+        jButton4.setFont(new java.awt.Font("Bahnschrift", 1, 18)); // NOI18N
+        jButton4.setForeground(new java.awt.Color(255, 255, 255));
+        jButton4.setText("Log out");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout gradientPanel1Layout = new javax.swing.GroupLayout(gradientPanel1);
         gradientPanel1.setLayout(gradientPanel1Layout);
         gradientPanel1Layout.setHorizontalGroup(
             gradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(gradientPanel1Layout.createSequentialGroup()
-                .addGap(89, 89, 89)
-                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gradientPanel1Layout.createSequentialGroup()
                 .addContainerGap(31, Short.MAX_VALUE)
                 .addGroup(gradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -434,8 +430,9 @@ private void setupMechanicComboBox() {
                         .addComponent(AdminRpbtn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(AdminAbtn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(AdminDbtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(AdminRbtn, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(AdminRpbtn1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(AdminRbtn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+                        .addComponent(AdminRpbtn1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(25, 25, 25))
         );
@@ -456,9 +453,9 @@ private void setupMechanicComboBox() {
                 .addComponent(AdminRpbtn, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(AdminRpbtn1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
-                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(56, 56, 56))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
+                .addComponent(jButton4)
+                .addGap(63, 63, 63))
         );
 
         getContentPane().add(gradientPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 330, 750));
@@ -878,7 +875,6 @@ private void setupMechanicComboBox() {
                 return types [columnIndex];
             }
         });
-        tablemechanic.setRowHeight(20);
         jScrollPane5.setViewportView(tablemechanic);
 
         javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
@@ -991,7 +987,6 @@ private void setupMechanicComboBox() {
             }
         });
         tableInventory1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableInventory1.setRowHeight(20);
         tableInventory1.getTableHeader().setReorderingAllowed(false);
         tableInventory1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1531,7 +1526,6 @@ private void setupMechanicComboBox() {
             }
         });
         manageissues.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        manageissues.setRowHeight(20);
         manageissues.getTableHeader().setReorderingAllowed(false);
         manageissues.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
