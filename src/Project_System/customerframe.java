@@ -267,6 +267,8 @@ private MediaPlayer mediaPlayer;
         issuess = new javax.swing.JTable();
         idontknow = new javax.swing.JButton();
         others = new javax.swing.JButton();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jLabel9 = new javax.swing.JLabel();
         Photos = new Project_System.Design.RoundedPanel();
         videopanel = new javax.swing.JPanel();
         image = new javax.swing.JButton();
@@ -977,22 +979,33 @@ private MediaPlayer mediaPlayer;
             }
         });
 
+        jCheckBox1.setText("Urgent Service (+30%)");
+
+        jLabel9.setText("Additional charges may apply.\"");
+
         javax.swing.GroupLayout issueLayout = new javax.swing.GroupLayout(issue);
         issue.setLayout(issueLayout);
         issueLayout.setHorizontalGroup(
             issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(issueLayout.createSequentialGroup()
-                .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(issueLayout.createSequentialGroup()
+                .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, issueLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18))
-                    .addGroup(issueLayout.createSequentialGroup()
-                        .addGap(55, 55, 55)
-                        .addComponent(idontknow, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(others, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(82, 82, 82)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, issueLayout.createSequentialGroup()
+                        .addGap(57, 57, 57)
+                        .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(issueLayout.createSequentialGroup()
+                                .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9)
+                                    .addComponent(jCheckBox1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(issueLayout.createSequentialGroup()
+                                .addComponent(idontknow, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(others, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(80, 80, 80)))))
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(37, 37, 37))
         );
@@ -1003,12 +1016,16 @@ private MediaPlayer mediaPlayer;
                 .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(issueLayout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(issueLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(idontknow)
-                            .addComponent(others))))
-                .addContainerGap(26, Short.MAX_VALUE))
+                            .addComponent(others)
+                            .addComponent(idontknow))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel9)))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         createreqpanel.add(issue, "card3");
@@ -5154,6 +5171,7 @@ handleServiceCar(3);
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -5182,6 +5200,7 @@ handleServiceCar(3);
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
